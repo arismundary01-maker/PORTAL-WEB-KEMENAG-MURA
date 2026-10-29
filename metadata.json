@@ -1,0 +1,6 @@
+{
+  "name": "Portal Resmi Kantor Kementerian Agama Kabupaten Murung Raya",
+  "description": "Portal Informasi dan Layanan Publik Resmi Kantor Kementerian Agama Kabupaten Murung Raya, Kalimantan Tengah. Menyajikan profil, warta, pengumuman, data keagamaan, serta pengelolaan informasi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
