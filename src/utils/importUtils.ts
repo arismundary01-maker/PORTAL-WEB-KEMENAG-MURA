@@ -197,6 +197,22 @@ export function downloadImportTemplate(sector: DataSectorTab, subType?: string):
         Kontak: "085233445566"
       }
     ];
+  } else if (sector === 'bimas-budha') {
+    fileName = 'Template_Data_Vihara_Cetiya_Budha_Mura';
+    sampleData = [
+      {
+        NamaVihara: "Cetiya Dharma Loka",
+        Jenis: "Cetiya",
+        SekteTradisi: "Mahayana",
+        Kecamatan: "Murung",
+        Alamat: "Jl. Jenderal Sudirman No. 88",
+        NamaPanditaRomo: "Romo Surya Dharma",
+        JumlahUmat: 45,
+        TahunBerdiri: 2015,
+        KegiatanRutin: "Puja Bakti Minggu Pagi & Meditasi",
+        Kontak: "081255443322"
+      }
+    ];
   }
 
   const ws = XLSX.utils.json_to_sheet(sampleData);

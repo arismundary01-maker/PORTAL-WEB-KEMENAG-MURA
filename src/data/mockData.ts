@@ -4,7 +4,8 @@ import {
   RumahIbadahIslam, 
   KuaKecamatan, 
   TempatIbadahKristen, 
-  TempatIbadahHindu, 
+  TempatIbadahHindu,
+  TempatIbadahBudha, 
   Berita, 
   Pengumuman, 
   PejabatEselon, 
@@ -915,6 +916,61 @@ export const INITIAL_BALAI_HINDU: TempatIbadahHindu[] = [
     tahunBerdiri: 2014,
     kegiatanRutin: "Persembahyangan Purnama, Tilem, Hari Raya Nyepi, & Saraswati",
     kontak: "08125099341"
+  }
+];
+
+export const INITIAL_VIHARA_BUDHA: TempatIbadahBudha[] = [
+  {
+    id: "bd-01",
+    namaVihara: "Cetiya Avalokitesvara Puruk Cahu",
+    jenis: "Cetiya",
+    sekteTradisi: "Mahayana",
+    kecamatan: "Murung",
+    alamat: "Jl. Jenderal Sudirman No. 45, Puruk Cahu",
+    namaPanditaRomo: "Romo Sutrisno Dharmavira",
+    jumlahUmat: 88,
+    tahunBerdiri: 2005,
+    kegiatanRutin: "Kebaktian Umum setiap Minggu pagi, Puja Bakti Hari Raya Waisak & Asadha",
+    kontak: "08125199882"
+  },
+  {
+    id: "bd-02",
+    namaVihara: "Vihara Dharma Shanti Muara Laung",
+    jenis: "Vihara",
+    sekteTradisi: "Buddhayana",
+    kecamatan: "Laung Tuhup",
+    alamat: "Jl. Dermaga Pelabuhan No. 12, Muara Laung",
+    namaPanditaRomo: "Pandita Hendra Wijaya",
+    jumlahUmat: 64,
+    tahunBerdiri: 2011,
+    kegiatanRutin: "Meditasi Samatha Bhavana, Pembacaan Paritta mingguan, Bakti Sosial",
+    kontak: "08524900123"
+  },
+  {
+    id: "bd-03",
+    namaVihara: "Sanggar Ibadah Tri Ratna Saripoi",
+    jenis: "Sanggar Ibadah",
+    sekteTradisi: "Theravada",
+    kecamatan: "Tanah Siang",
+    alamat: "Desa Saripoi RT 02",
+    namaPanditaRomo: "Upasaka Budi Santoso",
+    jumlahUmat: 42,
+    tahunBerdiri: 2018,
+    kegiatanRutin: "Kebaktian Ananda & Pembinaan Moralitas Pancasila Buddhis",
+    kontak: "08134812399"
+  },
+  {
+    id: "bd-04",
+    namaVihara: "Cetiya Maitreya Kasih Barito",
+    jenis: "Cetiya",
+    sekteTradisi: "Maitreya",
+    kecamatan: "Permata Intan",
+    alamat: "Kelurahan Tumbang Lahung",
+    namaPanditaRomo: "Pandita Lie Sioe Ling",
+    jumlahUmat: 35,
+    tahunBerdiri: 2016,
+    kegiatanRutin: "Kebaktian vegetarian bulanan, Kelas Budi Pekerti Anak",
+    kontak: "08215477890"
   }
 ];
 

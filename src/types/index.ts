@@ -14,7 +14,8 @@ export type DataSectorTab =
   | 'pendidikan-islam' 
   | 'bimas-islam' 
   | 'bimas-kristen' 
-  | 'bimas-hindu';
+  | 'bimas-hindu'
+  | 'bimas-budha';
 
 export interface Pegawai {
   id: string;
@@ -95,6 +96,20 @@ export interface TempatIbadahHindu {
   kecamatan: string;
   alamat: string;
   namaBasirPemimpin: string;
+  jumlahUmat: number;
+  tahunBerdiri: number;
+  kegiatanRutin: string;
+  kontak: string;
+}
+
+export interface TempatIbadahBudha {
+  id: string;
+  namaVihara: string;
+  jenis: 'Vihara' | 'Cetiya' | 'Arama' | 'Sanggar Ibadah';
+  sekteTradisi: 'Theravada' | 'Mahayana' | 'Maitreya' | 'Nichiren' | 'Buddhayana';
+  kecamatan: string;
+  alamat: string;
+  namaPanditaRomo: string;
   jumlahUmat: number;
   tahunBerdiri: number;
   kegiatanRutin: string;

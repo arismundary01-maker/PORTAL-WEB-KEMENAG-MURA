@@ -6,9 +6,14 @@ import { MapPin, Phone, Mail, Globe, ExternalLink, ShieldCheck } from 'lucide-re
 interface FooterProps {
   onSelectTab: (tab: NavigationTab) => void;
   onSelectProfilSubTab: (subTab: ProfilSubTab) => void;
+  onOpenAdmin?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectProfilSubTab }) => {
+export const Footer: React.FC<FooterProps> = ({ 
+  onSelectTab, 
+  onSelectProfilSubTab,
+  onOpenAdmin 
+}) => {
   return (
     <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-12">
@@ -146,6 +151,17 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectProfilSubTa
               </li>
               <li>
                 <a
+                  href="https://sipendismura.my.id"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-between text-emerald-400 font-medium hover:text-emerald-300 transition-colors"
+                >
+                  <span>SI PENDIS MURA (Pendidikan Islam)</span>
+                  <ExternalLink className="w-3 h-3 text-emerald-400" />
+                </a>
+              </li>
+              <li>
+                <a
                   href="https://emis.kemenag.go.id"
                   target="_blank"
                   rel="noreferrer"
@@ -213,6 +229,10 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectProfilSubTa
             <span>Keterbukaan Informasi Publik (KIP)</span>
             <span>·</span>
             <span>Satu Data Kemenag</span>
+            <span>·</span>
+            <span className="text-slate-400 font-mono text-[11px] bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">
+              Pintasan Pengelola: <kbd className="text-emerald-400 font-semibold">Ctrl + Shift + A</kbd>
+            </span>
           </div>
         </div>
       </div>

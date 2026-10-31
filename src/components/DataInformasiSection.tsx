@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   DataSectorTab, 
   Pegawai, 
@@ -6,7 +6,8 @@ import {
   RumahIbadahIslam, 
   KuaKecamatan, 
   TempatIbadahKristen, 
-  TempatIbadahHindu 
+  TempatIbadahHindu,
+  TempatIbadahBudha 
 } from '../types';
 import { 
   exportToExcel, 
@@ -34,7 +35,9 @@ import {
   Landmark,
   X,
   FileCheck2,
-  RefreshCw
+  RefreshCw,
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
 
 interface DataInformasiSectionProps {
@@ -50,6 +53,9 @@ interface DataInformasiSectionProps {
   setTempatIbadahKristenData: React.Dispatch<React.SetStateAction<TempatIbadahKristen[]>>;
   tempatIbadahHinduData: TempatIbadahHindu[];
   setTempatIbadahHinduData: React.Dispatch<React.SetStateAction<TempatIbadahHindu[]>>;
+  tempatIbadahBudhaData?: TempatIbadahBudha[];
+  setTempatIbadahBudhaData?: React.Dispatch<React.SetStateAction<TempatIbadahBudha[]>>;
+  initialSectorTab?: DataSectorTab;
 }
 
 export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
@@ -64,9 +70,20 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
   tempatIbadahKristenData,
   setTempatIbadahKristenData,
   tempatIbadahHinduData,
-  setTempatIbadahHinduData
+  setTempatIbadahHinduData,
+  tempatIbadahBudhaData = [],
+  setTempatIbadahBudhaData,
+  initialSectorTab = 'kepegawaian'
 }) => {
-  const [activeSector, setActiveSector] = useState<DataSectorTab>('kepegawaian');
+  const [activeSector, setActiveSector] = useState<DataSectorTab>(initialSectorTab);
+
+  useEffect(() => {
+    if (initialSectorTab) {
+      setActiveSector(initialSectorTab);
+      setSearchTable('');
+      setFilterKecamatan('all');
+    }
+  }, [initialSectorTab]);
   const [bimasIslamSubTab, setBimasIslamSubTab] = useState<'rumah-ibadah' | 'kua'>('rumah-ibadah');
   const [searchTable, setSearchTable] = useState('');
   const [filterKecamatan, setFilterKecamatan] = useState<string>('all');
@@ -187,6 +204,20 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
         Kontak: h.kontak
       }));
       exportToExcel(data, `Data_Tempat_Ibadah_Hindu_Mura_${timestamp}`, 'Bimas Hindu');
+    } else if (activeSector === 'bimas-budha') {
+      const data = (tempatIbadahBudhaData || []).map(b => ({
+        NamaTempatIbadah: b.namaVihara,
+        Jenis: b.jenis,
+        SekteTradisi: b.sekteTradisi,
+        Kecamatan: b.kecamatan,
+        Alamat: b.alamat,
+        PanditaRomo: b.namaPanditaRomo,
+        JumlahUmat: b.jumlahUmat,
+        TahunBerdiri: b.tahunBerdiri,
+        KegiatanRutin: b.kegiatanRutin,
+        Kontak: b.kontak
+      }));
+      exportToExcel(data, `Data_Tempat_Ibadah_Budha_Mura_${timestamp}`, 'Bimas Budha');
     }
     showToast('File Excel (.xlsx) berhasil digenerate dan diunduh.');
   };
@@ -207,6 +238,8 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
       exportToCSV(tempatIbadahKristenData as any, `Data_Gereja_Kristen_Mura_${timestamp}`);
     } else if (activeSector === 'bimas-hindu') {
       exportToCSV(tempatIbadahHinduData as any, `Data_Balai_Hindu_Mura_${timestamp}`);
+    } else if (activeSector === 'bimas-budha') {
+      exportToCSV((tempatIbadahBudhaData || []) as any, `Data_Vihara_Budha_Mura_${timestamp}`);
     }
     showToast('File CSV berhasil diunduh.');
   };
@@ -343,6 +376,27 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
         rows,
         fileName: `Laporan_Rumah_Ibadah_Hindu_Mura_${timestamp}.pdf`
       });
+    } else if (activeSector === 'bimas-budha') {
+      const headers = ['No', 'Nama Vihara / Cetiya', 'Jenis', 'Sekte / Tradisi', 'Kecamatan', 'Alamat', 'Pandita / Romo', 'Jumlah Umat', 'Th Berdiri'];
+      const rows = (tempatIbadahBudhaData || []).map((b, idx) => [
+        idx + 1,
+        b.namaVihara,
+        b.jenis,
+        b.sekteTradisi,
+        b.kecamatan,
+        b.alamat,
+        b.namaPanditaRomo,
+        `${b.jumlahUmat.toLocaleString('id-ID')} Jiwa`,
+        b.tahunBerdiri
+      ]);
+      exportToOfficialPDF({
+        title: 'DATA TEMPAT IBADAH & JUMLAH UMAT BUDDHA KABUPATEN MURUNG RAYA',
+        subTitle: 'PENYELENGGARA BIMAS BUDDHA KEMENAG KABUPATEN MURUNG RAYA',
+        sectorName: 'Bimas Buddha',
+        headers,
+        rows,
+        fileName: `Laporan_Tempat_Ibadah_Budha_Mura_${timestamp}.pdf`
+      });
     }
 
     showToast('Laporan PDF resmi dengan Kop Surat Kemenag Mura berhasil digenerate.');
@@ -467,6 +521,21 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
         kontak: String(row['Kontak'] || '08123456789')
       }));
       setTempatIbadahHinduData(prev => [...prev, ...newItems]);
+    } else if (activeSector === 'bimas-budha' && setTempatIbadahBudhaData) {
+      const newItems: TempatIbadahBudha[] = importPreviewData.map((row, idx) => ({
+        id: `bd-imp-${Date.now()}-${idx}`,
+        namaVihara: String(row['NamaVihara'] || row['namaVihara'] || 'Cetiya Baru'),
+        jenis: (String(row['Jenis'] || 'Cetiya') as any),
+        sekteTradisi: (String(row['SekteTradisi'] || 'Mahayana') as any),
+        kecamatan: String(row['Kecamatan'] || 'Murung'),
+        alamat: String(row['Alamat'] || 'Puruk Cahu'),
+        namaPanditaRomo: String(row['NamaPanditaRomo'] || 'Pandita Romo'),
+        jumlahUmat: Number(row['JumlahUmat'] || 50),
+        tahunBerdiri: Number(row['TahunBerdiri'] || 2015),
+        kegiatanRutin: String(row['KegiatanRutin'] || 'Puja Bakti'),
+        kontak: String(row['Kontak'] || '08123456789')
+      }));
+      setTempatIbadahBudhaData(prev => [...prev, ...newItems]);
     }
 
     setIsImportModalOpen(false);
@@ -505,6 +574,8 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
       setTempatIbadahKristenData(prev => prev.filter(k => k.id !== id));
     } else if (activeSector === 'bimas-hindu') {
       setTempatIbadahHinduData(prev => prev.filter(h => h.id !== id));
+    } else if (activeSector === 'bimas-budha' && setTempatIbadahBudhaData) {
+      setTempatIbadahBudhaData(prev => prev.filter(b => b.id !== id));
     }
     showToast('Data berhasil dihapus.');
   };
@@ -629,6 +700,25 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
         };
         setTempatIbadahHinduData(prev => [newItem, ...prev]);
       }
+    } else if (activeSector === 'bimas-budha' && setTempatIbadahBudhaData) {
+      if (editingItem) {
+        setTempatIbadahBudhaData(prev => prev.map(b => b.id === editingItem.id ? { ...b, ...formData } : b));
+      } else {
+        const newItem: TempatIbadahBudha = {
+          id: `bd-${Date.now()}`,
+          namaVihara: formData.namaVihara || formData.nama || 'Cetiya Baru',
+          jenis: formData.jenis || 'Cetiya',
+          sekteTradisi: formData.sekteTradisi || 'Mahayana',
+          kecamatan: formData.kecamatan || 'Murung',
+          alamat: formData.alamat || 'Puruk Cahu',
+          namaPanditaRomo: formData.namaPanditaRomo || 'Pandita Romo',
+          jumlahUmat: Number(formData.jumlahUmat || 45),
+          tahunBerdiri: Number(formData.tahunBerdiri || 2015),
+          kegiatanRutin: formData.kegiatanRutin || 'Puja Bakti',
+          kontak: formData.kontak || '08123456789'
+        };
+        setTempatIbadahBudhaData(prev => [newItem, ...prev]);
+      }
     }
 
     setIsAddEditModalOpen(false);
@@ -674,8 +764,11 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
                 : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
             }`}
           >
-            <GraduationCap className="w-3.5 h-3.5" />
-            <span>2. Pendidikan Islam (Madrasah & Pesantren)</span>
+            <GraduationCap className="w-3.5 h-3.5 text-emerald-500" />
+            <span>2. Pendidikan Islam (SI PENDIS MURA)</span>
+            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-400 text-emerald-950 uppercase">
+              Online
+            </span>
           </button>
 
           <button
@@ -712,6 +805,18 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
           >
             <Landmark className="w-3.5 h-3.5" />
             <span>5. Bimas Hindu (Kaharingan)</span>
+          </button>
+
+          <button
+            onClick={() => handleSectorChange('bimas-budha')}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
+              activeSector === 'bimas-budha'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            <span className="font-bold text-sm">☸</span>
+            <span>6. Bimas Budha</span>
           </button>
         </div>
       </div>
@@ -918,102 +1023,92 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
         </div>
       )}
 
-      {/* SECTOR 2: DATA PENDIDIKAN ISLAM (LEMBAGA BINAAN) */}
+      {/* SECTOR 2: INTEGRASI RESMI SI PENDIS MURA (sipendismura.my.id) */}
       {activeSector === 'pendidikan-islam' && (
-        <div className="space-y-4 animate-fadeIn">
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <div className="text-xs text-slate-500 font-medium">Total Lembaga Binaan</div>
-              <div className="text-2xl font-bold text-slate-900 mt-1 font-mono tabular-nums">{lembagaPendisData.length} Lembaga</div>
-            </div>
-            <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <div className="text-xs text-slate-500 font-medium">Total Siswa / Santri</div>
-              <div className="text-2xl font-bold text-emerald-800 mt-1 font-mono tabular-nums">
-                {lembagaPendisData.reduce((acc, curr) => acc + curr.jumlahSiswa, 0).toLocaleString('id-ID')} Siswa
+        <div className="space-y-6 animate-fadeIn">
+          {/* Main Integration Banner */}
+          <div className="bg-linear-to-r from-emerald-900 via-teal-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-emerald-700/60 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 text-amber-300 text-xs font-semibold border border-emerald-600/50">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Sistem Informasi Terpadu Seksi Pendidikan Islam</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+                  SI PENDIS MURA (sipendismura.my.id)
+                </h2>
+                <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
+                  Pengelolaan data kelembagaan madrasah (RA, MI, MTs, MA, Pondok Pesantren), data guru pendidik, siswa, serta perizinan operasional kini dikelola secara terpusat melalui portal resmi <strong>sipendismura.my.id</strong>.
+                </p>
+                <div className="pt-2 flex flex-wrap items-center gap-3">
+                  <a
+                    href="https://sipendismura.my.id"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 text-xs font-bold text-emerald-950 bg-amber-400 hover:bg-amber-300 rounded-xl shadow-md transition-all flex items-center gap-2"
+                  >
+                    <span>Buka sipendismura.my.id di Tab Baru</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                  <span className="text-xs text-emerald-200">
+                    Sistem aktif & tersinkronisasi 24/7
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <div className="text-xs text-slate-500 font-medium">Total Tenaga Pendidik / Guru</div>
-              <div className="text-2xl font-bold text-blue-800 mt-1 font-mono tabular-nums">
-                {lembagaPendisData.reduce((acc, curr) => acc + curr.jumlahGuru, 0)} Guru
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <div className="text-xs text-slate-500 font-medium">Akreditasi A</div>
-              <div className="text-2xl font-bold text-amber-700 mt-1 font-mono tabular-nums">
-                {lembagaPendisData.filter(l => l.akreditasi === 'A').length} Lembaga
+
+              {/* 3 Core Services of SI PENDIS */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-2.5 min-w-[260px]">
+                <div className="bg-white/10 backdrop-blur-xs p-3 rounded-xl border border-white/10">
+                  <div className="font-bold text-amber-300 text-xs">EMIS Madrasah 4.0</div>
+                  <div className="text-[11px] text-emerald-100 mt-0.5">Pendataan Kelembagaan & Siswa</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-xs p-3 rounded-xl border border-white/10">
+                  <div className="font-bold text-amber-300 text-xs">SIMPATIKA Kemenag</div>
+                  <div className="text-[11px] text-emerald-100 mt-0.5">Tunjangan Profesi & Sertifikasi Guru</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-xs p-3 rounded-xl border border-white/10">
+                  <div className="font-bold text-amber-300 text-xs">Izin Operasional LPQ / Pontren</div>
+                  <div className="text-[11px] text-emerald-100 mt-0.5">Verifikasi & Penerbitan Rekomendasi</div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Table */}
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-            <div className="overflow-x-auto custom-scrollbar">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="bg-slate-100/90 text-slate-700 border-b border-slate-200 font-semibold">
-                    <th className="py-3 px-4 w-12 text-center">No</th>
-                    <th className="py-3 px-4 w-40">NSM / NPSN</th>
-                    <th className="py-3 px-4">Nama Lembaga Binaan</th>
-                    <th className="py-3 px-4">Jenjang</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Kecamatan</th>
-                    <th className="py-3 px-4">Kepala Lembaga</th>
-                    <th className="py-3 px-4 text-center">Siswa</th>
-                    <th className="py-3 px-4 text-center">Guru</th>
-                    <th className="py-3 px-4 text-center">Akred</th>
-                    <th className="py-3 px-4 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {lembagaPendisData
-                    .filter(l => 
-                      !searchTable ||
-                      l.namaLembaga.toLowerCase().includes(searchTable.toLowerCase()) ||
-                      l.nsm.includes(searchTable) ||
-                      l.kecamatan.toLowerCase().includes(searchTable.toLowerCase()) ||
-                      l.jenjang.toLowerCase().includes(searchTable.toLowerCase())
-                    )
-                    .map((item, idx) => (
-                      <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="py-3 px-4 text-center font-mono text-slate-400">{idx + 1}</td>
-                        <td className="py-3 px-4 font-mono text-[11px] text-slate-600">
-                          <div>{item.nsm}</div>
-                          <div className="text-slate-400">{item.npsn}</div>
-                        </td>
-                        <td className="py-3 px-4 font-bold text-slate-900">{item.namaLembaga}</td>
-                        <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 font-medium">
-                            {item.jenjang}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-slate-700">{item.status}</td>
-                        <td className="py-3 px-4 text-slate-700">{item.kecamatan}</td>
-                        <td className="py-3 px-4 text-slate-700">{item.kepalaLembaga}</td>
-                        <td className="py-3 px-4 text-center font-mono font-medium">{item.jumlahSiswa}</td>
-                        <td className="py-3 px-4 text-center font-mono">{item.jumlahGuru}</td>
-                        <td className="py-3 px-4 text-center font-bold text-emerald-800">{item.akreditasi}</td>
-                        <td className="py-3 px-4 text-right whitespace-nowrap">
-                          <button
-                            onClick={() => handleOpenEditModal(item)}
-                            className="p-1 text-slate-400 hover:text-emerald-700 mr-1"
-                            title="Edit"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteItem(item.id)}
-                            className="p-1 text-slate-400 hover:text-rose-700"
-                            title="Hapus"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+          {/* Embedded Interactive Viewer for sipendismura.my.id */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden">
+            <div className="bg-slate-900 text-white px-5 py-3 flex items-center justify-between border-b border-slate-800 text-xs">
+              <div className="flex items-center gap-3">
+                <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                <span className="font-mono text-emerald-300 text-[11px] sm:text-xs">
+                  https://sipendismura.my.id
+                </span>
+                <span className="hidden sm:inline text-slate-500">|</span>
+                <span className="hidden sm:inline text-slate-300 text-[11px]">
+                  Jendela Aplikasi Resmi Terbuka di Portal
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="https://sipendismura.my.id"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-white rounded-md text-[11px] font-semibold transition-colors flex items-center gap-1.5"
+                  title="Buka di peramban penuh"
+                >
+                  <span>Layar Penuh</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+
+            <div className="w-full h-[680px] bg-slate-100 relative">
+              <iframe
+                src="https://sipendismura.my.id"
+                title="Sistem Informasi Pendidikan Islam Kab. Murung Raya (SI PENDIS MURA)"
+                className="w-full h-full border-none"
+              />
             </div>
           </div>
         </div>
@@ -1307,6 +1402,103 @@ export const DataInformasiSection: React.FC<DataInformasiSectionProps> = ({
                           <button
                             onClick={() => handleDeleteItem(item.id)}
                             className="p-1 text-slate-400 hover:text-rose-700"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 6. TAB DATA BIMAS BUDHA */}
+      {activeSector === 'bimas-budha' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="bg-white p-4 rounded-xl border border-slate-200">
+              <div className="text-xs text-slate-500 font-medium">Total Vihara & Cetiya</div>
+              <div className="text-2xl font-bold text-slate-900 mt-1 font-mono">
+                {tempatIbadahBudhaData.length} Lembaga
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200">
+              <div className="text-xs text-slate-500 font-medium">Estimasi Jumlah Umat</div>
+              <div className="text-2xl font-bold text-cyan-700 mt-1 font-mono">
+                {tempatIbadahBudhaData.reduce((acc, curr) => acc + curr.jumlahUmat, 0).toLocaleString('id-ID')} Jiwa
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200">
+              <div className="text-xs text-slate-500 font-medium">Tradisi Terdaftar</div>
+              <div className="text-xs font-bold text-slate-800 mt-1">
+                Mahayana, Buddhayana, Theravada, Maitreya
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200">
+              <div className="text-xs text-slate-500 font-medium">Pusat Peribadatan</div>
+              <div className="text-sm font-bold text-cyan-800 mt-1">
+                Puruk Cahu & Muara Laung
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-100/90 text-slate-700 border-b border-slate-200 font-semibold">
+                    <th className="py-3 px-4 w-12 text-center">No</th>
+                    <th className="py-3 px-4">Nama Vihara / Cetiya</th>
+                    <th className="py-3 px-4">Jenis</th>
+                    <th className="py-3 px-4">Sekte / Tradisi</th>
+                    <th className="py-3 px-4">Kecamatan</th>
+                    <th className="py-3 px-4">Alamat</th>
+                    <th className="py-3 px-4">Pandita / Romo</th>
+                    <th className="py-3 px-4 text-center">Jumlah Umat</th>
+                    <th className="py-3 px-4">Kegiatan Rutin</th>
+                    <th className="py-3 px-4 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {tempatIbadahBudhaData
+                    .filter(b => 
+                      !searchTable ||
+                      b.namaVihara.toLowerCase().includes(searchTable.toLowerCase()) ||
+                      b.kecamatan.toLowerCase().includes(searchTable.toLowerCase()) ||
+                      b.namaPanditaRomo.toLowerCase().includes(searchTable.toLowerCase())
+                    )
+                    .map((item, idx) => (
+                      <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="py-3 px-4 text-center font-mono text-slate-400">{idx + 1}</td>
+                        <td className="py-3 px-4 font-bold text-slate-900">{item.namaVihara}</td>
+                        <td className="py-3 px-4">
+                          <span className="px-2 py-0.5 rounded-md bg-cyan-50 text-cyan-800 font-semibold text-[10px]">
+                            {item.jenis}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-slate-700">{item.sekteTradisi}</td>
+                        <td className="py-3 px-4 text-slate-700">{item.kecamatan}</td>
+                        <td className="py-3 px-4 text-slate-600">{item.alamat}</td>
+                        <td className="py-3 px-4 text-slate-900 font-medium">{item.namaPanditaRomo}</td>
+                        <td className="py-3 px-4 text-center font-mono font-bold text-cyan-800">
+                          {item.jumlahUmat.toLocaleString('id-ID')} Jiwa
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 truncate max-w-[180px]">{item.kegiatanRutin}</td>
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
+                          <button
+                            onClick={() => handleOpenEditModal(item)}
+                            className="p-1 text-slate-400 hover:text-cyan-700 mr-1"
+                            title="Edit Data"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteItem(item.id)}
+                            className="p-1 text-slate-400 hover:text-rose-700"
+                            title="Hapus Data"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
