@@ -1,11 +1,136 @@
-import React from 'react';
+import { LogoType } from '../types/admin';
 
 interface OfficialEmblemProps {
   className?: string;
   size?: number;
+  logoType?: LogoType;
+  customLogoUrl?: string;
 }
 
-export const OfficialEmblem: React.FC<OfficialEmblemProps> = ({ className = '', size = 44 }) => {
+export const OfficialEmblem: React.FC<OfficialEmblemProps> = ({ 
+  className = '', 
+  size = 44,
+  logoType = 'kemenag-ri',
+  customLogoUrl
+}) => {
+  // If custom logo URL is specified
+  if (logoType === 'custom' && customLogoUrl) {
+    return (
+      <img
+        src={customLogoUrl}
+        alt="Logo Kemenag Murung Raya"
+        width={size}
+        height={size}
+        className={`object-contain rounded-lg shrink-0 ${className}`}
+        onError={(e) => {
+          // fallback if image link fails
+          (e.currentTarget as HTMLElement).style.display = 'none';
+        }}
+      />
+    );
+  }
+
+  // Lambang Kabupaten Murung Raya (Tira Tangka Balang)
+  if (logoType === 'pemkab-mura') {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-label="Lambang Daerah Kabupaten Murung Raya - Tira Tangka Balang"
+      >
+        <defs>
+          <linearGradient id="muraPerisai" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#15803d" />
+            <stop offset="100%" stopColor="#052e16" />
+          </linearGradient>
+          <linearGradient id="muraGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f59e0b" />
+            <stop offset="100%" stopColor="#b45309" />
+          </linearGradient>
+        </defs>
+
+        {/* Dayak Talawang Shield Form */}
+        <polygon
+          points="50,4 88,18 78,82 50,96 22,82 12,18"
+          fill="url(#muraPerisai)"
+          stroke="url(#muraGold)"
+          strokeWidth="3.5"
+          strokeLinejoin="round"
+        />
+        <polygon
+          points="50,9 82,21 73,78 50,91 27,78 18,21"
+          fill="none"
+          stroke="#fef08a"
+          strokeWidth="1.2"
+          opacity="0.85"
+        />
+
+        {/* Bintang Emas */}
+        <polygon
+          points="50,14 53,21 60,21 54.5,25.5 56.5,32 50,28 43.5,32 45.5,25.5 40,21 47,21"
+          fill="#fbbf24"
+          stroke="#d97706"
+          strokeWidth="0.6"
+        />
+
+        {/* Belanga & Dohong/Mandau Adat Dayak */}
+        <path
+          d="M 50 34 L 50 72"
+          stroke="#fbbf24"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 36 42 Q 50 36 64 42 L 58 64 Q 50 68 42 64 Z"
+          fill="#1e3a8a"
+          stroke="#fbbf24"
+          strokeWidth="1.5"
+        />
+
+        {/* Padi & Kapas */}
+        <path
+          d="M 26 44 C 22 56 24 68 34 76"
+          stroke="#fbbf24"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M 74 44 C 78 56 76 68 66 76"
+          stroke="#ffffff"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          fill="none"
+        />
+
+        {/* Pita Bawah: TIRA TANGKA BALANG */}
+        <path
+          d="M 22 79 Q 50 75 78 79 L 76 85 Q 50 81 24 85 Z"
+          fill="#fbbf24"
+          stroke="#b45309"
+          strokeWidth="0.8"
+        />
+        <text
+          x="50"
+          y="83"
+          fill="#1c1917"
+          fontSize="4.2"
+          fontWeight="900"
+          fontFamily="Helvetica, sans-serif"
+          textAnchor="middle"
+          letterSpacing="0.3"
+        >
+          TIRA TANGKA BALANG
+        </text>
+      </svg>
+    );
+  }
+
+  // Standard Kemenag RI / Kemenag Kalteng
   return (
     <svg
       width={size}
@@ -55,15 +180,11 @@ export const OfficialEmblem: React.FC<OfficialEmblemProps> = ({ className = '', 
       />
 
       {/* Scales of Justice (Keadilan) */}
-      {/* Central Axis */}
       <line x1="50" y1="31" x2="50" y2="56" stroke="#fbbf24" strokeWidth="2.5" strokeLinecap="round" />
-      {/* Horizontal Beam */}
       <path d="M 32 37 Q 50 35 68 37" stroke="#fbbf24" strokeWidth="2" fill="none" strokeLinecap="round" />
-      {/* Left Pan Strings & Pan */}
       <line x1="33" y1="37" x2="28" y2="47" stroke="#fef08a" strokeWidth="1" />
       <line x1="33" y1="37" x2="38" y2="47" stroke="#fef08a" strokeWidth="1" />
       <path d="M 26 47 Q 33 52 40 47 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="0.6" />
-      {/* Right Pan Strings & Pan */}
       <line x1="67" y1="37" x2="62" y2="47" stroke="#fef08a" strokeWidth="1" />
       <line x1="67" y1="37" x2="72" y2="47" stroke="#fef08a" strokeWidth="1" />
       <path d="M 60 47 Q 67 52 74 47 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="0.6" />
@@ -76,7 +197,6 @@ export const OfficialEmblem: React.FC<OfficialEmblemProps> = ({ className = '', 
         strokeWidth="1.2"
       />
       <line x1="50" y1="54" x2="50" y2="66" stroke="#064e3b" strokeWidth="1.2" />
-      {/* Text lines on book */}
       <line x1="32" y1="55" x2="46" y2="57" stroke="#94a3b8" strokeWidth="0.7" />
       <line x1="32" y1="58" x2="46" y2="60" stroke="#94a3b8" strokeWidth="0.7" />
       <line x1="54" y1="57" x2="68" y2="55" stroke="#94a3b8" strokeWidth="0.7" />
@@ -111,11 +231,11 @@ export const OfficialEmblem: React.FC<OfficialEmblemProps> = ({ className = '', 
         fill="#1e293b"
         fontSize="5"
         fontWeight="800"
-        fontFamily="sans-serif"
+        fontFamily="Helvetica, sans-serif"
         textAnchor="middle"
         letterSpacing="0.4"
       >
-        IKHLAS BERAMAL
+        {logoType === 'kemenag-kalteng' ? 'KALTENG BERAMAL' : 'IKHLAS BERAMAL'}
       </text>
     </svg>
   );

@@ -16,11 +16,31 @@ export type OperatorSeksiType =
   | 'bimas-islam' 
   | 'bimas-kristen' 
   | 'bimas-hindu' 
-  | 'bimas-budha';
+  | 'bimas-budha'
+  | 'phu';
+
+export type HeaderThemeType = 'emerald' | 'navy' | 'forest' | 'maroon' | 'custom';
+export type LogoType = 'kemenag-ri' | 'kemenag-kalteng' | 'pemkab-mura' | 'custom';
+
+export interface PortalConfig {
+  namaInstansi: string;
+  subInstansi: string;
+  tagline: string;
+  telepon: string;
+  email: string;
+  alamat: string;
+  ptspUrl: string;
+  sipendisUrl: string;
+  logoType: LogoType;
+  customLogoUrl?: string;
+  headerTheme: HeaderThemeType;
+  customHeaderColor?: string;
+}
 
 export interface AdminUser {
   id: string;
   username: string;
+  password?: string;
   nama: string;
   gelar: string;
   nip: string;
@@ -33,6 +53,7 @@ export interface AdminUser {
   jabatan: string;
   foto?: string;
   loginTime: string;
+  isActive?: boolean;
 }
 
 export interface AuditLog {
@@ -58,3 +79,4 @@ export interface PtspPermohonan {
   posisiSeksi: string;
   catatanPetugas?: string;
 }
+

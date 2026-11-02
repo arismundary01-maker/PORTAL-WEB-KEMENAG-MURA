@@ -230,9 +230,17 @@ export const Footer: React.FC<FooterProps> = ({
             <span>·</span>
             <span>Satu Data Kemenag</span>
             <span>·</span>
-            <span className="text-slate-400 font-mono text-[11px] bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">
-              Pintasan Pengelola: <kbd className="text-emerald-400 font-semibold">Ctrl + Shift + A</kbd>
-            </span>
+            <button
+              type="button"
+              onClick={onOpenAdmin}
+              className="text-slate-400 hover:text-emerald-300 font-mono text-[11px] bg-slate-800/90 hover:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700 hover:border-emerald-500/50 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs group"
+              title="Klik di sini atau tekan kombinasi Ctrl + Shift + A untuk membuka dialog Login Administrator"
+            >
+              <span className="group-hover:text-slate-200">Pintasan Pengelola:</span>
+              <kbd className="text-emerald-400 group-hover:text-emerald-300 font-semibold bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700">
+                Ctrl + Shift + A
+              </kbd>
+            </button>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavigationTab, ProfilSubTab, DataSectorTab } from '../types';
+import { PortalConfig } from '../types/admin';
 import { OfficialEmblem } from './OfficialEmblem';
 import { 
   ChevronDown, 
@@ -20,6 +21,7 @@ interface HeaderProps {
   onSelectProfilSubTab: (subTab: ProfilSubTab) => void;
   onSelectSector?: (sector: DataSectorTab) => void;
   onOpenPtspModal?: () => void;
+  portalConfig?: PortalConfig;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -27,11 +29,33 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectTab,
   onSelectProfilSubTab,
   onSelectSector,
-  onOpenPtspModal
+  onOpenPtspModal,
+  portalConfig
 }) => {
   const [profilDropdownOpen, setProfilDropdownOpen] = useState(false);
   const [seksiDropdownOpen, setSeksiDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const theme = portalConfig?.headerTheme || 'emerald';
+  const customColor = portalConfig?.customHeaderColor || '#064e3b';
+
+  const getThemeMicroBarStyle = () => {
+    switch (theme) {
+      case 'navy':
+        return { className: 'bg-slate-900 text-sky-100 border-slate-800' };
+      case 'forest':
+        return { className: 'bg-[#022c22] text-emerald-100 border-[#064e3b]' };
+      case 'maroon':
+        return { className: 'bg-[#3b0707] text-amber-100 border-[#4c0519]' };
+      case 'custom':
+        return { className: 'text-white border-white/20', style: { backgroundColor: customColor } };
+      case 'emerald':
+      default:
+        return { className: 'bg-emerald-950 text-emerald-100 border-emerald-900' };
+    }
+  };
+
+  const microBarStyle = getThemeMicroBarStyle();
 
   const handleTabClick = (tab: NavigationTab) => {
     onSelectTab(tab);
@@ -56,28 +80,31 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-50 bg-white/98 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
-      {/* Top micro-bar for institutional trust & contact (NO ADMIN LOGIN BUTTON AS REQUESTED) */}
-      <div className="bg-emerald-950 text-emerald-100 text-xs py-1.5 px-4 sm:px-8 border-b border-emerald-900 hidden md:block">
+      {/* Top micro-bar for institutional trust & contact */}
+      <div 
+        className={`text-xs py-1.5 px-4 sm:px-8 border-b hidden md:block transition-colors duration-300 ${microBarStyle.className}`}
+        style={microBarStyle.style}
+      >
         <div className="max-w-7xl mx-auto flex items-center justify-between text-xs tracking-normal">
           <div className="flex items-center gap-3">
             <span className="font-semibold text-emerald-300">Portal Resmi</span>
-            <span className="text-emerald-700">|</span>
+            <span className="opacity-50">|</span>
             <span>Kantor Wilayah Kementerian Agama Prov. Kalimantan Tengah</span>
-            <span className="text-emerald-700">|</span>
-            <span className="italic">"Tira Tangka Balang - Ikhlas Beramal"</span>
+            <span className="opacity-50">|</span>
+            <span className="italic">"{portalConfig?.tagline || 'Tira Tangka Balang - Ikhlas Beramal'}"</span>
           </div>
-          <div className="flex items-center gap-4 text-emerald-200">
+          <div className="flex items-center gap-4 opacity-90">
             <span className="flex items-center gap-1.5">
               <PhoneCall className="w-3 h-3 text-emerald-400" />
-              (0528) 31445
+              {portalConfig?.telepon || '(0528) 31445'}
             </span>
-            <span className="text-emerald-700">|</span>
+            <span className="opacity-50">|</span>
             <span>Puruk Cahu, Kab. Murung Raya</span>
           </div>
         </div>
       </div>
 
-      {/* Main Branding Bar (Replicating Official Banner Header) */}
+      {/* Main Branding Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4 py-3 sm:py-3.5 border-b border-slate-100">
           
@@ -86,16 +113,25 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => handleTabClick('beranda')}
             className="flex items-center gap-3 text-left focus:outline-hidden group shrink-0"
           >
-            <OfficialEmblem size={52} className="transition-transform group-hover:scale-105 shrink-0" />
+            <OfficialEmblem 
+              size={52} 
+              logoType={portalConfig?.logoType || 'kemenag-ri'}
+              customLogoUrl={portalConfig?.customLogoUrl}
+              className="transition-transform group-hover:scale-105 shrink-0" 
+            />
             <div className="flex flex-col">
-              <span className="text-sm sm:text-base font-extrabold text-[#0f5132] tracking-wide uppercase leading-tight font-sans">
-                KEMENTERIAN AGAMA
+              <span className={`text-sm sm:text-base font-extrabold tracking-wide uppercase leading-tight font-sans ${
+                theme === 'navy' ? 'text-blue-900' :
+                theme === 'maroon' ? 'text-rose-900' :
+                theme === 'forest' ? 'text-emerald-950' : 'text-[#0f5132]'
+              }`}>
+                {portalConfig?.namaInstansi || 'KEMENTERIAN AGAMA'}
               </span>
               <span className="text-xs sm:text-sm font-bold text-slate-800 tracking-wider uppercase leading-tight">
-                KABUPATEN MURUNG RAYA
+                {portalConfig?.subInstansi || 'KABUPATEN MURUNG RAYA'}
               </span>
               <span className="text-[10px] text-slate-500 font-medium">
-                Provinsi Kalimantan Tengah · Ikhlas Beramal
+                {portalConfig?.tagline || 'Provinsi Kalimantan Tengah · Ikhlas Beramal'}
               </span>
             </div>
           </button>

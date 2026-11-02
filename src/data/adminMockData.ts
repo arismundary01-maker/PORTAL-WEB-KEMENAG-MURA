@@ -1,10 +1,26 @@
-import { AdminUser, AuditLog, PtspPermohonan } from '../types/admin';
+import { AdminUser, AuditLog, PtspPermohonan, PortalConfig } from '../types/admin';
+
+export const DEFAULT_PORTAL_CONFIG: PortalConfig = {
+  namaInstansi: "KEMENTERIAN AGAMA",
+  subInstansi: "KABUPATEN MURUNG RAYA",
+  tagline: "Provinsi Kalimantan Tengah · Ikhlas Beramal",
+  telepon: "(0528) 31445",
+  email: "kemenag.murungraya@kemenag.go.id",
+  alamat: "Jl. Jenderal Sudirman No. 12, Kompleks Perkantoran Pemkab, Puruk Cahu 73911",
+  ptspUrl: "https://ptsp-kemenag-mura.vercel.app/",
+  sipendisUrl: "https://sipendismura.my.id",
+  logoType: "kemenag-ri",
+  customLogoUrl: "",
+  headerTheme: "emerald",
+  customHeaderColor: "#064e3b"
+};
 
 export const ADMIN_USERS: AdminUser[] = [
   // 1. Admin Super (Akses & Edit Semua Data Portal)
   {
     id: "adm-super-01",
     username: "superadmin",
+    password: "kemenagmura2026",
     nama: "Bambang Kurniawan",
     gelar: "S.Kom",
     nip: "199002142019031008",
@@ -13,13 +29,15 @@ export const ADMIN_USERS: AdminUser[] = [
     roleLabel: "Admin Super (Administrator Utama)",
     kewenanganDeskripsi: "Akses penuh dan hak cipta/edit seluruh modul data, berita, pengumuman, galeri, seksi perbidang, antrean PTSP, serta pengaturan portal.",
     jabatan: "Pranata Komputer Ahli Pertama / Koordinator IT Kankemenag",
-    loginTime: "2026-10-31 08:30 WIB"
+    loginTime: "2026-10-31 08:30 WIB",
+    isActive: true
   },
 
   // 2. Humas & Publikasi (Akses & Edit Warta Berita dan Galeri Kegiatan)
   {
     id: "adm-humas-01",
     username: "humas",
+    password: "kemenagmura2026",
     nama: "Nurul Hidayati",
     gelar: "S.I.Kom",
     nip: "199407182020122011",
@@ -28,13 +46,15 @@ export const ADMIN_USERS: AdminUser[] = [
     roleLabel: "Humas & Protokoler",
     kewenanganDeskripsi: "Kewenangan khusus mengelola, menulis, mengedit, dan mempublikasikan Berita Terkini, Pengumuman Dinas, serta Dokumentasi Galeri Kegiatan.",
     jabatan: "Pranata Humas / Pengelola Pemberitaan & Protokol",
-    loginTime: "2026-10-31 08:35 WIB"
+    loginTime: "2026-10-31 08:35 WIB",
+    isActive: true
   },
 
   // 3. Operator Seksi: Kepegawaian & Umum
   {
     id: "op-pegawai-01",
     username: "op_kepegawaian",
+    password: "kemenagmura2026",
     nama: "Muhammad Ridwan",
     gelar: "S.AP",
     nip: "198811052014021003",
@@ -45,13 +65,15 @@ export const ADMIN_USERS: AdminUser[] = [
     seksiLabel: "Seksi Kepegawaian & Tata Usaha",
     kewenanganDeskripsi: "Kewenangan terbatas mengelola, menambah, mengedit, dan mengekspor Data Pegawai (PNS, PPPK, PPNPN) Kemenag Murung Raya.",
     jabatan: "Pengelola Kepegawaian Subbag TU",
-    loginTime: "2026-10-31 08:40 WIB"
+    loginTime: "2026-10-31 08:40 WIB",
+    isActive: true
   },
 
   // 4. Operator Seksi: Pendidikan Islam (SI PENDIS MURA)
   {
     id: "op-pendis-01",
     username: "op_pendis",
+    password: "kemenagmura2026",
     nama: "Supriyanto",
     gelar: "M.Pd",
     nip: "198305172008011012",
@@ -62,13 +84,15 @@ export const ADMIN_USERS: AdminUser[] = [
     seksiLabel: "Seksi Pendidikan Islam (Pendis)",
     kewenanganDeskripsi: "Kewenangan mengelola integrasi SI PENDIS MURA (sipendismura.my.id), EMIS Madrasah, dan verifikasi izin operasional pendidikan Islam.",
     jabatan: "Operator EMIS / Staf Seksi Pendis",
-    loginTime: "2026-10-31 08:45 WIB"
+    loginTime: "2026-10-31 08:45 WIB",
+    isActive: true
   },
 
   // 5. Operator Seksi: Bimas Islam (Masjid & KUA)
   {
     id: "op-bimasislam-01",
     username: "op_bimasislam",
+    password: "kemenagmura2026",
     nama: "H. Ahmad Fauzi",
     gelar: "S.Sos.I",
     nip: "198402192009121004",
@@ -79,13 +103,15 @@ export const ADMIN_USERS: AdminUser[] = [
     seksiLabel: "Seksi Bimbingan Masyarakat Islam",
     kewenanganDeskripsi: "Kewenangan khusus mengelola data Rumah Ibadah (Masjid & Mushalla), data tanah wakaf, dan operasional 10 KUA Kecamatan.",
     jabatan: "Pengelola Kemasjidan & KUA Seksi Bimas Islam",
-    loginTime: "2026-10-31 08:50 WIB"
+    loginTime: "2026-10-31 08:50 WIB",
+    isActive: true
   },
 
   // 6. Operator Seksi: Bimas Kristen
   {
     id: "op-bimaskristen-01",
     username: "op_bimaskristen",
+    password: "kemenagmura2026",
     nama: "Daniel Kristiawan",
     gelar: "S.Th",
     nip: "198904222019031005",
@@ -96,13 +122,15 @@ export const ADMIN_USERS: AdminUser[] = [
     seksiLabel: "Penyelenggara Bimas Kristen",
     kewenanganDeskripsi: "Kewenangan khusus mengelola data Rumah Ibadah Kristen (Gereja Protestan & Katolik), data kependetaan, dan jumlah umat kristen.",
     jabatan: "Staf Penyelenggara Bimas Kristen",
-    loginTime: "2026-10-31 08:52 WIB"
+    loginTime: "2026-10-31 08:52 WIB",
+    isActive: true
   },
 
   // 7. Operator Seksi: Bimas Hindu
   {
     id: "op-bimashindu-01",
     username: "op_bimashindu",
+    password: "kemenagmura2026",
     nama: "I Wayan Suwandi",
     gelar: "S.Ag",
     nip: "199108152020121009",
@@ -113,13 +141,15 @@ export const ADMIN_USERS: AdminUser[] = [
     seksiLabel: "Penyelenggara Bimas Hindu",
     kewenanganDeskripsi: "Kewenangan khusus mengelola data Balai Basarah, data Basir/Rohaniwan, dan statistik umat Hindu Kaharingan.",
     jabatan: "Staf Penyelenggara Bimas Hindu",
-    loginTime: "2026-10-31 08:55 WIB"
+    loginTime: "2026-10-31 08:55 WIB",
+    isActive: true
   },
 
   // 8. Operator Seksi: Bimas Budha
   {
     id: "op-bimasbudha-01",
     username: "op_bimasbudha",
+    password: "kemenagmura2026",
     nama: "Suryadi Dharma",
     gelar: "S.Ag",
     nip: "199203112022031004",
@@ -130,7 +160,8 @@ export const ADMIN_USERS: AdminUser[] = [
     seksiLabel: "Penyelenggara Bimas Budha",
     kewenanganDeskripsi: "Kewenangan khusus mengelola data Vihara, Cetiya, Pandita/Romo, dan statistik umat Budha Kabupaten Murung Raya.",
     jabatan: "Staf Penyelenggara Bimas Budha",
-    loginTime: "2026-10-31 08:58 WIB"
+    loginTime: "2026-10-31 08:58 WIB",
+    isActive: true
   }
 ];
 

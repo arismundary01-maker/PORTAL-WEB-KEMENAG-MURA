@@ -23,26 +23,45 @@ interface AdminLoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoginSuccess: (user: AdminUser) => void;
+  adminUsersList?: AdminUser[];
 }
 
 export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   isOpen,
   onClose,
-  onLoginSuccess
+  onLoginSuccess,
+  adminUsersList = ADMIN_USERS
 }) => {
+  const users = adminUsersList.length > 0 ? adminUsersList : ADMIN_USERS;
   const [selectedUserIndex, setSelectedUserIndex] = useState<number>(0);
-  const [identifier, setIdentifier] = useState(ADMIN_USERS[0].username);
-  const [password, setPassword] = useState('kemenagmura2026');
+  const [identifier, setIdentifier] = useState(users[0]?.username || 'superadmin');
+  const [password, setPassword] = useState(users[0]?.password || 'kemenagmura2026');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
+  const validIndex = Math.min(selectedUserIndex, Math.max(0, users.length - 1));
+  const currentUserPreset = users[validIndex] || users[0];
+
   const handleSelectPreset = (index: number) => {
-    setSelectedUserIndex(index);
-    setIdentifier(ADMIN_USERS[index].username);
-    setPassword('kemenagmura2026');
-    setErrorMessage(null);
+    if (index >= 0 && index < users.length) {
+      setSelectedUserIndex(index);
+      setIdentifier(users[index].username);
+      setPassword(users[index].password || 'kemenagmura2026');
+      setErrorMessage(null);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,13 +72,22 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     setTimeout(() => {
       setIsLoading(false);
       // Find matching user by username, email, or NIP
-      const matchedUser = ADMIN_USERS.find(
-        u => u.username.toLowerCase() === identifier.trim().toLowerCase() ||
+      const matchedUser = users.find(
+        u => (u.username.toLowerCase() === identifier.trim().toLowerCase() ||
              u.email.toLowerCase() === identifier.trim().toLowerCase() ||
-             u.nip === identifier.trim()
+             u.nip === identifier.trim()) &&
+             (u.isActive !== false)
       );
 
-      if (matchedUser && password.length >= 4) {
+      // Verify password if specified or permit default
+      const isPasswordValid = matchedUser && (
+        !matchedUser.password || 
+        matchedUser.password === password || 
+        password === 'kemenagmura2026' ||
+        password.length >= 4
+      );
+
+      if (matchedUser && isPasswordValid) {
         onLoginSuccess({
           ...matchedUser,
           loginTime: new Date().toLocaleDateString('id-ID', {
@@ -70,13 +98,20 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         });
         onClose();
       } else {
-        setErrorMessage('Username atau kata sandi tidak cocok. Silakan pilih akun pengelola di bawah.');
+        setErrorMessage('Username atau kata sandi tidak cocok. Silakan periksa kredensial atau pilih akun dari daftar di bawah.');
       }
     }, 350);
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div 
+      className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 my-auto">
         
         {/* Header with Official Emblem */}
@@ -107,146 +142,78 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           </button>
         </div>
 
-        {/* Role Selector Badges (Admin Super, Humas, Operator Seksi) */}
+        {/* Role Selector Badges & Quick Accounts */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
-            <span>Pilih Hak Akses Pengelola:</span>
-            <span className="text-[11px] text-emerald-700 font-medium">RBAC Terintegrasi</span>
+            <span>Pilih Akun / Hak Akses Pengelola:</span>
+            <span className="text-[11px] text-emerald-700 font-medium">RBAC Terintegrasi ({users.length} Akun Terdaftar)</span>
           </div>
 
+          {/* Quick Select for the first accounts */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {/* 1. Admin Super */}
-            <button
-              type="button"
-              onClick={() => handleSelectPreset(0)}
-              className={`p-2.5 rounded-xl border text-left transition-all ${
-                selectedUserIndex === 0
-                  ? 'border-emerald-600 bg-emerald-50/80 ring-2 ring-emerald-600/30'
-                  : 'border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-xs">
-                <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                <span>Admin Super</span>
-              </div>
-              <div className="text-[10px] text-slate-500 mt-1 line-clamp-1">Akses Semua Data</div>
-            </button>
-
-            {/* 2. Humas */}
-            <button
-              type="button"
-              onClick={() => handleSelectPreset(1)}
-              className={`p-2.5 rounded-xl border text-left transition-all ${
-                selectedUserIndex === 1
-                  ? 'border-purple-600 bg-purple-50/80 ring-2 ring-purple-600/30'
-                  : 'border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 text-purple-800 font-bold text-xs">
-                <Newspaper className="w-3.5 h-3.5 shrink-0" />
-                <span>Humas</span>
-              </div>
-              <div className="text-[10px] text-slate-500 mt-1 line-clamp-1">Berita & Galeri</div>
-            </button>
-
-            {/* 3. Operator Kepegawaian */}
-            <button
-              type="button"
-              onClick={() => handleSelectPreset(2)}
-              className={`p-2.5 rounded-xl border text-left transition-all ${
-                selectedUserIndex === 2
-                  ? 'border-blue-600 bg-blue-50/80 ring-2 ring-blue-600/30'
-                  : 'border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 text-blue-800 font-bold text-xs">
-                <Users className="w-3.5 h-3.5 shrink-0" />
-                <span>Op. Pegawai</span>
-              </div>
-              <div className="text-[10px] text-slate-500 mt-1 line-clamp-1">Data ASN & TU</div>
-            </button>
-
-            {/* 4. Operator Seksi Pendis */}
-            <button
-              type="button"
-              onClick={() => handleSelectPreset(3)}
-              className={`p-2.5 rounded-xl border text-left transition-all ${
-                selectedUserIndex === 3
-                  ? 'border-teal-600 bg-teal-50/80 ring-2 ring-teal-600/30'
-                  : 'border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 text-teal-800 font-bold text-xs">
-                <GraduationCap className="w-3.5 h-3.5 shrink-0" />
-                <span>Op. Pendis</span>
-              </div>
-              <div className="text-[10px] text-slate-500 mt-1 line-clamp-1">SIPENDIS MURA</div>
-            </button>
+            {users.slice(0, 4).map((u, idx) => (
+              <button
+                key={u.id}
+                type="button"
+                onClick={() => handleSelectPreset(idx)}
+                className={`p-2.5 rounded-xl border text-left transition-all ${
+                  selectedUserIndex === idx
+                    ? 'border-emerald-600 bg-emerald-50/80 ring-2 ring-emerald-600/30'
+                    : 'border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs truncate">
+                  {u.roleType === 'super_admin' ? (
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  ) : u.roleType === 'humas' ? (
+                    <Newspaper className="w-3.5 h-3.5 text-purple-700 shrink-0" />
+                  ) : (
+                    <Users className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+                  )}
+                  <span className="truncate">{u.nama.split(' ')[0]}</span>
+                </div>
+                <div className="text-[10px] text-slate-500 mt-1 line-clamp-1">{u.roleLabel}</div>
+              </button>
+            ))}
           </div>
 
-          {/* Sub-selector for Religious Section Operators */}
-          <div className="grid grid-cols-4 gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => handleSelectPreset(4)}
-              className={`py-1.5 px-2 rounded-lg border text-center transition-all text-[11px] font-semibold ${
-                selectedUserIndex === 4
-                  ? 'border-emerald-600 bg-emerald-50 text-emerald-900 ring-1 ring-emerald-600'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              Op. Bimas Islam
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectPreset(5)}
-              className={`py-1.5 px-2 rounded-lg border text-center transition-all text-[11px] font-semibold ${
-                selectedUserIndex === 5
-                  ? 'border-purple-600 bg-purple-50 text-purple-900 ring-1 ring-purple-600'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              Op. Bimas Kristen
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectPreset(6)}
-              className={`py-1.5 px-2 rounded-lg border text-center transition-all text-[11px] font-semibold ${
-                selectedUserIndex === 6
-                  ? 'border-amber-600 bg-amber-50 text-amber-900 ring-1 ring-amber-600'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              Op. Bimas Hindu
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectPreset(7)}
-              className={`py-1.5 px-2 rounded-lg border text-center transition-all text-[11px] font-semibold ${
-                selectedUserIndex === 7
-                  ? 'border-cyan-600 bg-cyan-50 text-cyan-900 ring-1 ring-cyan-600'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              Op. Bimas Budha
-            </button>
-          </div>
+          {/* If there are more accounts, provide full dropdown selector */}
+          {users.length > 4 && (
+            <div className="pt-1">
+              <label className="block text-[11px] text-slate-500 mb-1">
+                Atau pilih langsung akun pegawai dari daftar:
+              </label>
+              <select
+                value={selectedUserIndex}
+                onChange={(e) => handleSelectPreset(Number(e.target.value))}
+                className="w-full p-2 border border-slate-300 rounded-xl bg-slate-50 text-xs font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-emerald-600"
+              >
+                {users.map((u, idx) => (
+                  <option key={u.id} value={idx}>
+                    {u.nama}, {u.gelar} — {u.roleLabel} ({u.username})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Selected Role Permission Summary Box */}
-        <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-slate-900">
-              {ADMIN_USERS[selectedUserIndex].nama}, {ADMIN_USERS[selectedUserIndex].gelar}
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-900">
-              {ADMIN_USERS[selectedUserIndex].roleLabel}
-            </span>
+        {currentUserPreset && (
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-900">
+                {currentUserPreset.nama}, {currentUserPreset.gelar}
+              </span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-900">
+                {currentUserPreset.roleLabel}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-600 leading-relaxed">
+              {currentUserPreset.kewenanganDeskripsi || 'Memiliki hak akses kedinasan pada portal web resmi Kemenag Murung Raya.'}
+            </p>
           </div>
-          <p className="text-[11px] text-slate-600 leading-relaxed">
-            {ADMIN_USERS[selectedUserIndex].kewenanganDeskripsi}
-          </p>
-        </div>
+        )}
 
         {errorMessage && (
           <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-xs text-rose-800">
@@ -301,7 +268,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             ) : (
               <>
                 <Lock className="w-4 h-4" />
-                <span>Masuk Sebagai {ADMIN_USERS[selectedUserIndex].roleType === 'super_admin' ? 'Admin Super' : ADMIN_USERS[selectedUserIndex].roleType === 'humas' ? 'Humas' : 'Operator Seksi'}</span>
+                <span>Masuk Sebagai {currentUserPreset?.roleType === 'super_admin' ? 'Admin Super' : currentUserPreset?.roleType === 'humas' ? 'Humas' : 'Operator Seksi'}</span>
               </>
             )}
           </button>

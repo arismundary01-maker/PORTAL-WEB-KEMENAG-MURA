@@ -42,8 +42,12 @@ import {
 import { 
   DEFAULT_ADMIN, 
   INITIAL_AUDIT_LOGS, 
-  INITIAL_PTSP_PERMOHONAN 
+  INITIAL_PTSP_PERMOHONAN,
+  ADMIN_USERS,
+  DEFAULT_PORTAL_CONFIG
 } from './data/adminMockData';
+
+import { PortalConfig } from './types/admin';
 
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -65,7 +69,11 @@ export default function App() {
   const [selectedSector, setSelectedSector] = useState<DataSectorTab>('kepegawaian');
   const [isPtspModalOpen, setIsPtspModalOpen] = useState(false);
 
-  // Admin Management States
+  // Portal Configuration State (Logo, Header Theme, Contacts)
+  const [portalConfig, setPortalConfig] = useState<PortalConfig>(DEFAULT_PORTAL_CONFIG);
+
+  // Admin Management & Dynamic Staff Login Accounts
+  const [adminUsersList, setAdminUsersList] = useState<AdminUser[]>(ADMIN_USERS);
   const [viewMode, setViewMode] = useState<'public' | 'admin'>('public');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [currentAdminUser, setCurrentAdminUser] = useState<AdminUser | null>(null);
@@ -121,30 +129,47 @@ export default function App() {
 
   // Admin access handlers
   const handleOpenAdminTrigger = () => {
-    if (isAdminLoggedIn && currentAdminUser) {
-      setViewMode('admin');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      setIsAdminLoginModalOpen(true);
-    }
+    setIsAdminLoginModalOpen(true);
   };
 
   // Global Keyboard Shortcut Listener: Ctrl + Shift + A (Opens Admin Login Dialog)
   useEffect(() => {
+    // Focus window to capture keyboard input even inside iframe
+    try {
+      window.focus();
+    } catch {
+      // ignore
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       const isCtrlOrMeta = e.ctrlKey || e.metaKey;
       const isShift = e.shiftKey;
-      const key = e.key ? e.key.toLowerCase() : '';
-      const code = e.code;
+      const isAlt = e.altKey;
+      const key = (e.key || '').toLowerCase();
+      const code = e.code || '';
+      const keyCode = e.keyCode || e.which || 0;
 
-      if (isCtrlOrMeta && isShift && (key === 'a' || code === 'KeyA')) {
+      const isKeyA = key === 'a' || code === 'KeyA' || keyCode === 65;
+
+      // Specifically intercept Ctrl + Shift + A (and allow Ctrl + Alt + A as alternative in case browser traps Tab Search)
+      if (isCtrlOrMeta && (isShift || isAlt) && isKeyA) {
         e.preventDefault();
+        e.stopPropagation();
+        if (typeof e.stopImmediatePropagation === 'function') {
+          e.stopImmediatePropagation();
+        }
         setIsAdminLoginModalOpen(true);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    // Attach in capture phase on both window and document to intercept before browser defaults
+    window.addEventListener('keydown', handleKeyDown, { capture: true, passive: false });
+    document.addEventListener('keydown', handleKeyDown, { capture: true, passive: false });
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, { capture: true });
+      document.removeEventListener('keydown', handleKeyDown, { capture: true });
+    };
   }, []);
 
   const handleLoginSuccess = (user: AdminUser) => {
@@ -164,38 +189,50 @@ export default function App() {
   // If in Admin Management Mode
   if (viewMode === 'admin' && currentAdminUser) {
     return (
-      <AdminDashboard
-        currentUser={currentAdminUser}
-        onLogout={handleLogout}
-        onViewPublicSite={() => {
-          setViewMode('public');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        beritaList={beritaList}
-        setBeritaList={setBeritaList}
-        pengumumanList={pengumumanList}
-        setPengumumanList={setPengumumanList}
-        galeriList={galeriList}
-        setGaleriList={setGaleriList}
-        pegawaiData={pegawaiData}
-        setPegawaiData={setPegawaiData}
-        lembagaPendisData={lembagaPendisData}
-        setLembagaPendisData={setLembagaPendisData}
-        rumahIbadahIslamData={rumahIbadahIslamData}
-        setRumahIbadahIslamData={setRumahIbadahIslamData}
-        kuaData={kuaData}
-        setKuaData={setKuaData}
-        tempatIbadahKristenData={tempatIbadahKristenData}
-        setTempatIbadahKristenData={setTempatIbadahKristenData}
-        tempatIbadahHinduData={tempatIbadahHinduData}
-        setTempatIbadahHinduData={setTempatIbadahHinduData}
-        tempatIbadahBudhaData={tempatIbadahBudhaData}
-        setTempatIbadahBudhaData={setTempatIbadahBudhaData}
-        auditLogs={auditLogs}
-        setAuditLogs={setAuditLogs}
-        ptspRequests={ptspRequests}
-        setPtspRequests={setPtspRequests}
-      />
+      <>
+        <AdminDashboard
+          currentUser={currentAdminUser}
+          onLogout={handleLogout}
+          onViewPublicSite={() => {
+            setViewMode('public');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          portalConfig={portalConfig}
+          setPortalConfig={setPortalConfig}
+          adminUsersList={adminUsersList}
+          setAdminUsersList={setAdminUsersList}
+          beritaList={beritaList}
+          setBeritaList={setBeritaList}
+          pengumumanList={pengumumanList}
+          setPengumumanList={setPengumumanList}
+          galeriList={galeriList}
+          setGaleriList={setGaleriList}
+          pegawaiData={pegawaiData}
+          setPegawaiData={setPegawaiData}
+          lembagaPendisData={lembagaPendisData}
+          setLembagaPendisData={setLembagaPendisData}
+          rumahIbadahIslamData={rumahIbadahIslamData}
+          setRumahIbadahIslamData={setRumahIbadahIslamData}
+          kuaData={kuaData}
+          setKuaData={setKuaData}
+          tempatIbadahKristenData={tempatIbadahKristenData}
+          setTempatIbadahKristenData={setTempatIbadahKristenData}
+          tempatIbadahHinduData={tempatIbadahHinduData}
+          setTempatIbadahHinduData={setTempatIbadahHinduData}
+          tempatIbadahBudhaData={tempatIbadahBudhaData}
+          setTempatIbadahBudhaData={setTempatIbadahBudhaData}
+          auditLogs={auditLogs}
+          setAuditLogs={setAuditLogs}
+          ptspRequests={ptspRequests}
+          setPtspRequests={setPtspRequests}
+        />
+        <AdminLoginModal
+          isOpen={isAdminLoginModalOpen}
+          onClose={() => setIsAdminLoginModalOpen(false)}
+          onLoginSuccess={handleLoginSuccess}
+          adminUsersList={adminUsersList}
+        />
+      </>
     );
   }
 
@@ -238,7 +275,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Official Navigation Top Bar (Admin login button removed from header, replaced with Ctrl keyboard shortcut) */}
+      {/* Official Navigation Top Bar */}
       <Header
         currentTab={currentTab}
         onSelectTab={handleSelectTab}
@@ -246,6 +283,7 @@ export default function App() {
         onSelectProfilSubTab={handleSelectProfilSubTab}
         onSelectSector={handleSelectSector}
         onOpenPtspModal={() => setIsPtspModalOpen(true)}
+        portalConfig={portalConfig}
       />
 
       {/* Main Content View Switcher */}
@@ -340,6 +378,7 @@ export default function App() {
         isOpen={isAdminLoginModalOpen}
         onClose={() => setIsAdminLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+        adminUsersList={adminUsersList}
       />
 
     </div>

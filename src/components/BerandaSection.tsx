@@ -67,7 +67,7 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
         {/* Banner Container with Clean Institutional Backdrop (NO PHOTO BACKGROUND) */}
         <div className="relative w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-8 sm:pt-6 sm:pb-12">
           
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-emerald-800/20 bg-linear-to-br from-[#f0f9f4] via-white to-[#edf6f0] min-h-[560px] lg:min-h-[640px] flex flex-col justify-between">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-emerald-800/20 bg-linear-to-br from-[#f0f9f4] via-white to-[#edf6f0] pb-10 sm:pb-14">
             
             {/* Subtle decorative vector mesh accents (non-photographic) */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200/30 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
@@ -223,75 +223,6 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                     <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
-
-              </div>
-            </div>
-
-            {/* Bottom Curved Wave Banner with Golden Mandala & Pillars */}
-            <div className="relative z-10 bg-linear-to-r from-[#03361e] via-[#08492c] to-[#042817] text-white pt-5 pb-6 px-6 sm:px-10 mt-auto border-t-4 border-amber-400/80 shadow-2xl">
-              <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-                
-                {/* Left: Golden Dayak Mandala & 3 Service Pillars */}
-                <div className="flex flex-wrap items-center gap-6 sm:gap-8 justify-center lg:justify-start">
-                  
-                  {/* Golden Dayak Motif SVG */}
-                  <div className="shrink-0 text-amber-400">
-                    <svg viewBox="0 0 100 100" className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="50" cy="50" r="42" strokeDasharray="4 2" />
-                      <circle cx="50" cy="50" r="28" />
-                      <path d="M50 8 L50 92 M8 50 L92 50 M20 20 L80 80 M20 80 L80 20" />
-                      <polygon points="50,15 62,38 85,50 62,62 50,85 38,62 15,50 38,38" fill="rgba(251,191,36,0.2)" />
-                    </svg>
-                  </div>
-
-                  {/* Pillar 1: Melayani Dengan Hati */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-900/80 border border-emerald-700/60 flex items-center justify-center text-amber-300 shrink-0">
-                      <Handshake className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-emerald-300 font-medium uppercase tracking-wider">Komitmen</div>
-                      <div className="text-sm font-bold text-white">Melayani Dengan Hati</div>
-                    </div>
-                  </div>
-
-                  <div className="hidden sm:block h-8 w-px bg-emerald-700/60" />
-
-                  {/* Pillar 2: Profesional dan Akuntabel */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-900/80 border border-emerald-700/60 flex items-center justify-center text-amber-300 shrink-0">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-emerald-300 font-medium uppercase tracking-wider">Kinerja</div>
-                      <div className="text-sm font-bold text-white">Profesional dan Akuntabel</div>
-                    </div>
-                  </div>
-
-                  <div className="hidden sm:block h-8 w-px bg-emerald-700/60" />
-
-                  {/* Pillar 3: Inovatif untuk Negeri */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-900/80 border border-emerald-700/60 flex items-center justify-center text-amber-300 shrink-0">
-                      <Lightbulb className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-emerald-300 font-medium uppercase tracking-wider">Transformasi</div>
-                      <div className="text-sm font-bold text-white">Inovatif untuk Negeri</div>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Right: Golden Calligraphy Tagline */}
-                <div className="text-center lg:text-right shrink-0">
-                  <div className="font-serif italic text-2xl sm:text-3xl font-normal text-amber-300 tracking-wide drop-shadow-md">
-                    Kementerian Agama
-                  </div>
-                  <div className="font-serif italic text-xl sm:text-2xl font-bold text-white drop-shadow-md">
-                    Hadir untuk Umat
-                  </div>
-                </div>
 
               </div>
             </div>

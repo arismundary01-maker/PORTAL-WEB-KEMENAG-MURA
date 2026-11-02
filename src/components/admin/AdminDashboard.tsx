@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { AdminUser, AdminTab, AuditLog, PtspPermohonan } from '../../types/admin';
+import { 
+  AdminUser, 
+  AdminTab, 
+  AuditLog, 
+  PtspPermohonan, 
+  PortalConfig, 
+  LogoType, 
+  HeaderThemeType,
+  AdminRoleType,
+  OperatorSeksiType 
+} from '../../types/admin';
 import { 
   Berita, 
   Pengumuman, 
@@ -38,13 +48,24 @@ import {
   GraduationCap,
   Sparkles,
   RefreshCw,
-  Lock
+  Lock,
+  Palette,
+  KeyRound,
+  ShieldAlert,
+  UserCheck,
+  Check,
+  ChevronRight,
+  Filter
 } from 'lucide-react';
 
 interface AdminDashboardProps {
   currentUser: AdminUser;
   onLogout: () => void;
   onViewPublicSite: () => void;
+  portalConfig: PortalConfig;
+  setPortalConfig: React.Dispatch<React.SetStateAction<PortalConfig>>;
+  adminUsersList: AdminUser[];
+  setAdminUsersList: React.Dispatch<React.SetStateAction<AdminUser[]>>;
   // Shared state references
   beritaList: Berita[];
   setBeritaList: React.Dispatch<React.SetStateAction<Berita[]>>;
@@ -76,6 +97,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   currentUser,
   onLogout,
   onViewPublicSite,
+  portalConfig,
+  setPortalConfig,
+  adminUsersList,
+  setAdminUsersList,
   beritaList,
   setBeritaList,
   pengumumanList,
@@ -140,6 +165,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Operator sub-tab for Bimas Islam
   const [bimasIslamSubTab, setBimasIslamSubTab] = useState<'rumah-ibadah' | 'kua'>('rumah-ibadah');
+
+  // Pengaturan Super Admin Sub-tabs: 'branding' | 'akun' | 'kontak'
+  const [activePengaturanSubTab, setActivePengaturanSubTab] = useState<'branding' | 'akun' | 'kontak'>('branding');
+
+  // Form state for Portal Branding (Logo & Header Theme)
+  const [brandingForm, setBrandingForm] = useState<PortalConfig>(portalConfig);
+
+  // Sync brandingForm when portalConfig changes
+  React.useEffect(() => {
+    setBrandingForm(portalConfig);
+  }, [portalConfig]);
+
+  // Account Management Modal States (Super Admin)
+  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<AdminUser | null>(null);
+  const [accountFormData, setAccountFormData] = useState<Partial<AdminUser>>({});
+  const [showPasswordMap, setShowPasswordMap] = useState<Record<string, boolean>>({});
+
+  // Pegawai CRUD All-Bidang States
+  const [selectedBidangFilter, setSelectedBidangFilter] = useState<string>('semua');
+  const [isPegawaiModalOpen, setIsPegawaiModalOpen] = useState(false);
+  const [editingPegawai, setEditingPegawai] = useState<Pegawai | null>(null);
+  const [pegawaiFormData, setPegawaiFormData] = useState<Partial<Pegawai>>({});
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -427,6 +475,214 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
 
     setIsSeksiAddModalOpen(false);
+  };
+
+  // --- BRANDING (LOGO & HEADER THEME) HANDLER ---
+  const handleSaveBranding = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canAccessAll) {
+      showToast('Akses ditolak: Hanya Admin Super yang dapat mengubah tema dan logo.');
+      return;
+    }
+    setPortalConfig(brandingForm);
+    addAuditLog('Pengaturan Portal', 'Logo & Tema', `Memperbarui logo (${brandingForm.logoType}) dan tema header (${brandingForm.headerTheme})`);
+    showToast('Logo web dan tema header berhasil disimpan dan diterapkan!');
+  };
+
+  // --- AKUN LOGIN PEGAWAI CRUD HANDLERS (SUPER ADMIN) ---
+  const handleOpenAddAccount = () => {
+    if (!canAccessAll) {
+      showToast('Akses ditolak.');
+      return;
+    }
+    setEditingAccount(null);
+    setAccountFormData({
+      roleType: 'operator_seksi',
+      operatorSeksi: 'kepegawaian',
+      seksiLabel: 'Seksi Kepegawaian & Tata Usaha',
+      isActive: true,
+      password: 'kemenagmura2026',
+      gelar: 'S.AP'
+    });
+    setIsAccountModalOpen(true);
+  };
+
+  const handleOpenEditAccount = (acc: AdminUser) => {
+    if (!canAccessAll) {
+      showToast('Akses ditolak.');
+      return;
+    }
+    setEditingAccount(acc);
+    setAccountFormData({ ...acc });
+    setIsAccountModalOpen(true);
+  };
+
+  const handleSaveAccount = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canAccessAll) return;
+
+    const username = (accountFormData.username || '').trim().toLowerCase();
+    const nama = (accountFormData.nama || '').trim();
+    if (!username || !nama) {
+      showToast('Username dan nama wajib diisi.');
+      return;
+    }
+
+    let roleLabel = 'Operator Seksi';
+    let seksiLabel = accountFormData.seksiLabel || '';
+    let kewenanganDeskripsi = 'Kewenangan operasional kedinasan.';
+
+    if (accountFormData.roleType === 'super_admin') {
+      roleLabel = 'Admin Super (Administrator Utama)';
+      kewenanganDeskripsi = 'Akses penuh dan hak cipta/edit seluruh modul data, berita, pengumuman, galeri, seksi perbidang, antrean PTSP, serta pengaturan portal.';
+    } else if (accountFormData.roleType === 'humas') {
+      roleLabel = 'Humas & Protokoler';
+      kewenanganDeskripsi = 'Kewenangan khusus mengelola, menulis, mengedit, dan mempublikasikan Berita Terkini, Pengumuman Dinas, serta Dokumentasi Galeri Kegiatan.';
+    } else {
+      const op = accountFormData.operatorSeksi || 'kepegawaian';
+      if (op === 'kepegawaian') {
+        roleLabel = 'Operator Seksi Kepegawaian & TU';
+        seksiLabel = 'Seksi Kepegawaian & Tata Usaha';
+        kewenanganDeskripsi = 'Kewenangan terbatas mengelola, menambah, mengedit, dan mengekspor Data Pegawai Kemenag Murung Raya.';
+      } else if (op === 'pendis') {
+        roleLabel = 'Operator Seksi Pendidikan Islam';
+        seksiLabel = 'Seksi Pendidikan Islam (Pendis)';
+        kewenanganDeskripsi = 'Kewenangan mengelola integrasi SI PENDIS MURA (sipendismura.my.id) dan verifikasi lembaga pendis.';
+      } else if (op === 'bimas-islam') {
+        roleLabel = 'Operator Seksi Bimas Islam';
+        seksiLabel = 'Seksi Bimbingan Masyarakat Islam';
+        kewenanganDeskripsi = 'Kewenangan khusus mengelola data Rumah Ibadah (Masjid & Mushalla) dan 10 KUA Kecamatan.';
+      } else if (op === 'bimas-kristen') {
+        roleLabel = 'Operator Seksi Bimas Kristen';
+        seksiLabel = 'Penyelenggara Bimas Kristen';
+        kewenanganDeskripsi = 'Kewenangan khusus mengelola data Rumah Ibadah Kristen dan statistik umat Kristen.';
+      } else if (op === 'bimas-hindu') {
+        roleLabel = 'Operator Seksi Bimas Hindu';
+        seksiLabel = 'Penyelenggara Bimas Hindu';
+        kewenanganDeskripsi = 'Kewenangan khusus mengelola data Balai Basarah dan statistik umat Hindu Kaharingan.';
+      } else if (op === 'bimas-budha') {
+        roleLabel = 'Operator Seksi Bimas Budha';
+        seksiLabel = 'Penyelenggara Bimas Budha';
+        kewenanganDeskripsi = 'Kewenangan khusus mengelola data Vihara, Cetiya, dan statistik umat Budha.';
+      } else if (op === 'phu') {
+        roleLabel = 'Operator Seksi Haji & Umrah';
+        seksiLabel = 'Seksi Penyelenggaraan Haji dan Umrah';
+        kewenanganDeskripsi = 'Kewenangan khusus mengelola layanan pendaftaran dan berkas jemaah haji & umrah.';
+      }
+    }
+
+    if (editingAccount) {
+      setAdminUsersList(prev => prev.map(a => a.id === editingAccount.id ? {
+        ...a,
+        ...accountFormData,
+        username,
+        nama,
+        roleLabel,
+        seksiLabel,
+        kewenanganDeskripsi
+      } as AdminUser : a));
+      addAuditLog('Edit Akun', 'Pengaturan Akun', `Memperbarui akun login pegawai ${nama} (${username})`);
+      showToast(`Akun login ${username} berhasil diperbarui.`);
+    } else {
+      // Check duplicate username
+      if (adminUsersList.some(a => a.username.toLowerCase() === username)) {
+        showToast('Username telah digunakan oleh akun lain.');
+        return;
+      }
+      const newAcc: AdminUser = {
+        id: `adm-user-${Date.now()}`,
+        username,
+        password: accountFormData.password || 'kemenagmura2026',
+        nama,
+        gelar: accountFormData.gelar || 'S.Ag',
+        nip: accountFormData.nip || `199${Math.floor(10000000000000 + Math.random() * 9000000000000)}`,
+        email: accountFormData.email || `${username}@kemenagmura.go.id`,
+        roleType: accountFormData.roleType || 'operator_seksi',
+        roleLabel,
+        operatorSeksi: accountFormData.roleType === 'operator_seksi' ? accountFormData.operatorSeksi : undefined,
+        seksiLabel: accountFormData.roleType === 'operator_seksi' ? seksiLabel : undefined,
+        kewenanganDeskripsi,
+        jabatan: accountFormData.jabatan || 'Staf Pelaksana',
+        loginTime: 'Belum pernah login',
+        isActive: accountFormData.isActive ?? true
+      };
+      setAdminUsersList(prev => [...prev, newAcc]);
+      addAuditLog('Tambah Akun', 'Pengaturan Akun', `Membuat akun login pegawai baru ${nama} (${username})`);
+      showToast(`Akun login baru ${username} berhasil dibuat.`);
+    }
+    setIsAccountModalOpen(false);
+  };
+
+  const handleDeleteAccount = (acc: AdminUser) => {
+    if (!canAccessAll) return;
+    if (acc.id === currentUser.id) {
+      showToast('Tidak dapat menghapus akun yang sedang Anda gunakan saat ini.');
+      return;
+    }
+    if (!window.confirm(`Hapus akun login pegawai: ${acc.nama} (${acc.username})?`)) return;
+    setAdminUsersList(prev => prev.filter(a => a.id !== acc.id));
+    addAuditLog('Hapus Akun', 'Pengaturan Akun', `Menghapus akun login ${acc.username}`);
+    showToast(`Akun ${acc.username} telah dihapus.`);
+  };
+
+  // --- PEGAWAI SEMUA BIDANG CRUD HANDLERS ---
+  const handleOpenAddPegawai = (defaultUnitKerja?: string) => {
+    setEditingPegawai(null);
+    setPegawaiFormData({
+      unitKerja: defaultUnitKerja || (selectedBidangFilter !== 'semua' ? selectedBidangFilter : 'Subbag TU'),
+      status: 'PNS',
+      golongan: 'III/b',
+      masaKerjaTahun: 5,
+      pendidikanTerakhir: 'S1'
+    });
+    setIsPegawaiModalOpen(true);
+  };
+
+  const handleOpenEditPegawai = (p: Pegawai) => {
+    setEditingPegawai(p);
+    setPegawaiFormData({ ...p });
+    setIsPegawaiModalOpen(true);
+  };
+
+  const handleSavePegawai = (e: React.FormEvent) => {
+    e.preventDefault();
+    const nama = (pegawaiFormData.nama || '').trim();
+    if (!nama) {
+      showToast('Nama pegawai wajib diisi.');
+      return;
+    }
+
+    if (editingPegawai) {
+      setPegawaiData(prev => prev.map(p => p.id === editingPegawai.id ? { ...p, ...pegawaiFormData } as Pegawai : p));
+      addAuditLog('Edit Pegawai', 'Master Data Pegawai', `Memperbarui data pegawai ${nama}`);
+      showToast(`Data pegawai ${nama} berhasil diperbarui.`);
+    } else {
+      const newPegawai: Pegawai = {
+        id: `peg-${Date.now()}`,
+        nip: pegawaiFormData.nip || `199${Math.floor(10000000000000 + Math.random() * 9000000000000)}`,
+        nama,
+        gelar: pegawaiFormData.gelar || 'S.Ag',
+        jabatan: pegawaiFormData.jabatan || 'Pelaksana',
+        status: pegawaiFormData.status as any || 'PNS',
+        golongan: pegawaiFormData.golongan || 'III/b',
+        unitKerja: pegawaiFormData.unitKerja || 'Subbag TU',
+        pendidikanTerakhir: pegawaiFormData.pendidikanTerakhir || 'S1',
+        masaKerjaTahun: Number(pegawaiFormData.masaKerjaTahun || 5),
+        kontak: pegawaiFormData.kontak || '081234567890',
+        email: pegawaiFormData.email || 'pegawai@kemenag.go.id'
+      };
+      setPegawaiData(prev => [newPegawai, ...prev]);
+      addAuditLog('Tambah Pegawai', 'Master Data Pegawai', `Menambahkan pegawai ${nama} pada ${newPegawai.unitKerja}`);
+      showToast(`Pegawai ${nama} berhasil ditambahkan.`);
+    }
+    setIsPegawaiModalOpen(false);
+  };
+
+  const handleDeletePegawai = (p: Pegawai) => {
+    if (!window.confirm(`Hapus data pegawai: ${p.nama}, ${p.gelar}?`)) return;
+    setPegawaiData(prev => prev.filter(item => item.id !== p.id));
+    addAuditLog('Hapus Pegawai', 'Master Data Pegawai', `Menghapus data pegawai ${p.nama}`);
+    showToast(`Data pegawai ${p.nama} berhasil dihapus.`);
   };
 
   return (
@@ -1061,50 +1317,140 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 </div>
 
-                {/* Seksi Display based on role */}
+                {/* Seksi Display based on role: DATA PEGAWAI SEMUA BIDANG */}
                 {(canAccessAll || opSeksi === 'kepegawaian') && (
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-emerald-700" />
-                        <span className="font-bold text-slate-900 text-xs">Seksi Kepegawaian & Tata Usaha</span>
+                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4 text-emerald-700" />
+                          <h3 className="font-bold text-slate-900 text-sm">
+                            Master Data Pegawai Semua Bidang & Seksi
+                          </h3>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
+                          Kelola, tambah, dan edit data seluruh ASN (PNS, PPPK, PPNPN) di setiap bidang/seksi Kemenag Murung Raya.
+                        </p>
                       </div>
-                      <span className="text-xs font-mono font-bold text-emerald-800">{pegawaiData.length} Pegawai</span>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenAddPegawai()}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-emerald-800 hover:bg-emerald-900 rounded-lg shadow-xs transition-colors"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Tambah Pegawai Baru</span>
+                        </button>
+                      </div>
                     </div>
-                    <div className="overflow-x-auto max-h-60 custom-scrollbar">
+
+                    {/* Bidang / Unit Kerja Filter Chips */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                      <span className="text-slate-400 flex items-center gap-1 mr-1 text-[11px] font-semibold">
+                        <Filter className="w-3 h-3" />
+                        <span>Filter Bidang:</span>
+                      </span>
+                      {[
+                        { key: 'semua', label: 'Semua Bidang' },
+                        { key: 'Pimpinan', label: 'Pimpinan' },
+                        { key: 'Subbag TU', label: 'Subbag TU' },
+                        { key: 'Pendidikan Islam', label: 'Seksi Pendis' },
+                        { key: 'Bimas Islam', label: 'Bimas Islam & KUA' },
+                        { key: 'Bimas Kristen', label: 'Bimas Kristen' },
+                        { key: 'Bimas Hindu', label: 'Bimas Hindu' },
+                        { key: 'Bimas Budha', label: 'Bimas Budha' },
+                        { key: 'Haji', label: 'Seksi PHU' }
+                      ].map(filter => {
+                        const count = filter.key === 'semua' 
+                          ? pegawaiData.length 
+                          : pegawaiData.filter(p => p.unitKerja.toLowerCase().includes(filter.key.toLowerCase())).length;
+                        return (
+                          <button
+                            key={filter.key}
+                            type="button"
+                            onClick={() => setSelectedBidangFilter(filter.key)}
+                            className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-all text-xs flex items-center gap-1.5 ${
+                              selectedBidangFilter === filter.key
+                                ? 'bg-emerald-800 text-white font-bold shadow-xs'
+                                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span>{filter.label}</span>
+                            <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                              selectedBidangFilter === filter.key ? 'bg-emerald-900 text-emerald-100' : 'bg-slate-100 text-slate-500'
+                            }`}>
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Filtered Pegawai Table */}
+                    <div className="overflow-x-auto max-h-72 custom-scrollbar border border-slate-200 rounded-lg bg-white">
                       <table className="w-full text-left text-xs border-collapse">
                         <thead>
-                          <tr className="bg-slate-200/60 text-slate-700">
-                            <th className="p-2">NIP</th>
-                            <th className="p-2">Nama</th>
-                            <th className="p-2">Jabatan</th>
-                            <th className="p-2">Status</th>
-                            <th className="p-2 text-right">Aksi</th>
+                          <tr className="bg-slate-100 text-slate-700 border-b border-slate-200 sticky top-0 z-10">
+                            <th className="p-2.5">Pegawai & NIP</th>
+                            <th className="p-2.5">Jabatan Kedinasan</th>
+                            <th className="p-2.5">Bidang / Unit Kerja</th>
+                            <th className="p-2.5 text-center">Status / Golongan</th>
+                            <th className="p-2.5">Kontak & Email</th>
+                            <th className="p-2.5 text-right w-24">Aksi</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-200">
-                          {pegawaiData.slice(0, 10).map((p) => (
-                            <tr key={p.id}>
-                              <td className="p-2 font-mono text-slate-500">{p.nip}</td>
-                              <td className="p-2 font-semibold text-slate-900">{p.nama}, {p.gelar}</td>
-                              <td className="p-2 text-slate-600">{p.jabatan}</td>
-                              <td className="p-2"><span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 text-[10px]">{p.status}</span></td>
-                              <td className="p-2 text-right">
-                                <button
-                                  onClick={() => {
-                                    if (window.confirm(`Hapus pegawai: ${p.nama}?`)) {
-                                      setPegawaiData(prev => prev.filter(item => item.id !== p.id));
-                                      addAuditLog('Hapus Pegawai', 'Kepegawaian', `Hapus ${p.nama}`);
-                                      showToast('Pegawai dihapus.');
-                                    }
-                                  }}
-                                  className="text-rose-600 hover:text-rose-800 p-1"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
+                        <tbody className="divide-y divide-slate-100">
+                          {pegawaiData
+                            .filter(p => {
+                              if (selectedBidangFilter === 'semua') return true;
+                              return p.unitKerja.toLowerCase().includes(selectedBidangFilter.toLowerCase());
+                            })
+                            .map((p) => (
+                              <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="p-2.5">
+                                  <div className="font-bold text-slate-900">{p.nama}, {p.gelar}</div>
+                                  <div className="text-[11px] font-mono text-slate-500">{p.nip}</div>
+                                </td>
+                                <td className="p-2.5 text-slate-700 font-medium">{p.jabatan}</td>
+                                <td className="p-2.5">
+                                  <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium text-[11px]">
+                                    {p.unitKerja}
+                                  </span>
+                                </td>
+                                <td className="p-2.5 text-center">
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-semibold mr-1.5 ${
+                                    p.status === 'PNS' ? 'bg-emerald-100 text-emerald-900' :
+                                    p.status === 'PPPK' ? 'bg-blue-100 text-blue-900' : 'bg-slate-200 text-slate-700'
+                                  }`}>
+                                    {p.status}
+                                  </span>
+                                  <span className="font-mono text-slate-600 font-medium text-[11px]">{p.golongan}</span>
+                                </td>
+                                <td className="p-2.5">
+                                  <div className="text-slate-700 text-[11px]">{p.kontak}</div>
+                                  <div className="text-slate-400 text-[10px]">{p.email}</div>
+                                </td>
+                                <td className="p-2.5 text-right whitespace-nowrap">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenEditPegawai(p)}
+                                    className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded transition-colors mr-1"
+                                    title="Edit Data Pegawai"
+                                  >
+                                    <Edit3 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeletePegawai(p)}
+                                    className="p-1.5 text-slate-400 hover:text-rose-700 hover:bg-rose-50 rounded transition-colors"
+                                    title="Hapus Data Pegawai"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
                         </tbody>
                       </table>
                     </div>
@@ -1476,77 +1822,630 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* 8. PENGATURAN PORTAL (Super Admin Only) */}
             {currentAdminTab === 'pengaturan' && canAccessAll && (
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-6 animate-fadeIn">
-                <div className="border-b border-slate-100 pb-4">
-                  <h2 className="text-lg font-bold text-slate-900">
-                    Pengaturan Identitas & Kontak Portal
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Informasi kedinasan Kantor Kementerian Agama Kabupaten Murung Raya.
-                  </p>
+                <div className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <Settings className="w-5 h-5 text-emerald-800" />
+                      <span>Pengaturan Portal Resmi (Admin Super)</span>
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Kelola identitas visual, logo instansi, tema header, dan hak akses akun login pegawai.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Otoritas Administrator Utama</span>
+                    </span>
+                  </div>
                 </div>
 
-                <form 
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    addAuditLog('Simpan Pengaturan', 'Pengaturan', 'Memperbarui profil kontak kedinasan');
-                    showToast('Pengaturan identitas portal berhasil disimpan.');
-                  }}
-                  className="space-y-4 text-xs max-w-xl"
-                >
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Nama Instansi</label>
-                    <input
-                      type="text"
-                      defaultValue="Kantor Kementerian Agama Kabupaten Murung Raya"
-                      className="w-full p-2.5 border border-slate-300 rounded-xl bg-slate-50 text-slate-800"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Telepon Kedinasan</label>
-                      <input
-                        type="text"
-                        defaultValue="(0528) 31445"
-                        className="w-full p-2.5 border border-slate-300 rounded-xl"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-700 font-semibold mb-1">Email Resmi</label>
-                      <input
-                        type="email"
-                        defaultValue="kemenag.murungraya@kemenag.go.id"
-                        className="w-full p-2.5 border border-slate-300 rounded-xl"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Tautan Aplikasi PTSP Online</label>
-                    <input
-                      type="text"
-                      defaultValue="https://ptsp-kemenag-mura.vercel.app/"
-                      className="w-full p-2.5 border border-slate-300 rounded-xl font-mono text-[11px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Tautan SI PENDIS MURA</label>
-                    <input
-                      type="text"
-                      defaultValue="https://sipendismura.my.id"
-                      className="w-full p-2.5 border border-slate-300 rounded-xl font-mono text-[11px]"
-                    />
-                  </div>
+                {/* Sub-tab Navigation */}
+                <div className="flex items-center gap-2 border-b border-slate-200 pb-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setActivePengaturanSubTab('branding')}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-bold transition-all ${
+                      activePengaturanSubTab === 'branding'
+                        ? 'bg-emerald-800 text-white shadow-xs'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Palette className="w-3.5 h-3.5" />
+                    <span>Tema Header & Logo Web</span>
+                  </button>
 
                   <button
-                    type="submit"
-                    className="flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-emerald-800 hover:bg-emerald-900 rounded-xl shadow-xs"
+                    type="button"
+                    onClick={() => setActivePengaturanSubTab('akun')}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-bold transition-all ${
+                      activePengaturanSubTab === 'akun'
+                        ? 'bg-emerald-800 text-white shadow-xs'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
                   >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>Simpan Pengaturan</span>
+                    <Users className="w-3.5 h-3.5" />
+                    <span>Akun Login Pegawai</span>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                      activePengaturanSubTab === 'akun' ? 'bg-emerald-950 text-white' : 'bg-slate-200 text-slate-700'
+                    }`}>
+                      {adminUsersList.length}
+                    </span>
                   </button>
-                </form>
+
+                  <button
+                    type="button"
+                    onClick={() => setActivePengaturanSubTab('kontak')}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-bold transition-all ${
+                      activePengaturanSubTab === 'kontak'
+                        ? 'bg-emerald-800 text-white shadow-xs'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Kontak & Tautan Layanan</span>
+                  </button>
+                </div>
+
+                {/* SUB-TAB 1: TEMA HEADER & LOGO WEB */}
+                {activePengaturanSubTab === 'branding' && (
+                  <form onSubmit={handleSaveBranding} className="space-y-6">
+                    {/* Live Preview Box */}
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
+                        <span>Pratinjau Langsung Header Portal:</span>
+                        <span className="text-[10px] text-emerald-700 font-medium">Real-time Preview</span>
+                      </div>
+                      <div className="border border-slate-300 rounded-xl overflow-hidden shadow-xs bg-white">
+                        {/* Microbar preview */}
+                        <div 
+                          className="px-4 py-1.5 text-[10px] flex items-center justify-between text-white"
+                          style={{
+                            backgroundColor: brandingForm.headerTheme === 'navy' ? '#0f172a' :
+                                             brandingForm.headerTheme === 'forest' ? '#022c22' :
+                                             brandingForm.headerTheme === 'maroon' ? '#3b0707' :
+                                             brandingForm.headerTheme === 'custom' ? (brandingForm.customHeaderColor || '#064e3b') : '#022c22'
+                          }}
+                        >
+                          <div className="flex items-center gap-2 truncate">
+                            <span className="font-bold text-amber-300">Portal Resmi</span>
+                            <span>|</span>
+                            <span className="truncate">"{brandingForm.tagline}"</span>
+                          </div>
+                          <span className="hidden sm:inline font-mono">{brandingForm.telepon}</span>
+                        </div>
+                        {/* Header Main Branding Preview */}
+                        <div className="p-3 bg-white flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <OfficialEmblem 
+                              size={44} 
+                              logoType={brandingForm.logoType} 
+                              customLogoUrl={brandingForm.customLogoUrl} 
+                            />
+                            <div>
+                              <div className="text-xs sm:text-sm font-black uppercase text-slate-900 leading-tight">
+                                {brandingForm.namaInstansi}
+                              </div>
+                              <div className="text-[11px] font-bold text-slate-700 uppercase leading-tight">
+                                {brandingForm.subInstansi}
+                              </div>
+                              <div className="text-[9px] text-slate-500">
+                                {brandingForm.tagline}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white text-[11px] font-bold"
+                            style={{
+                              backgroundColor: brandingForm.headerTheme === 'navy' ? '#1e3a8a' :
+                                               brandingForm.headerTheme === 'forest' ? '#064e3b' :
+                                               brandingForm.headerTheme === 'maroon' ? '#881337' :
+                                               brandingForm.headerTheme === 'custom' ? (brandingForm.customHeaderColor || '#047857') : '#047857'
+                            }}
+                          >
+                            <span>Layanan PTSP Online</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section A: Pilihan Logo Web */}
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900">Pilihan Logo Web Instansi</h3>
+                        <p className="text-xs text-slate-500">Pilih logo resmi atau gunakan logo eksternal/kustom.</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                        {/* 1. Kemenag RI */}
+                        <div 
+                          onClick={() => setBrandingForm({ ...brandingForm, logoType: 'kemenag-ri' })}
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center text-center space-y-2 ${
+                            brandingForm.logoType === 'kemenag-ri'
+                              ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/30'
+                              : 'border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <OfficialEmblem size={46} logoType="kemenag-ri" />
+                          <div>
+                            <div className="font-bold text-slate-900 text-xs">Logo Kemenag RI</div>
+                            <div className="text-[10px] text-slate-500">Lambang Resmi Ikhlas Beramal</div>
+                          </div>
+                          {brandingForm.logoType === 'kemenag-ri' && (
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-800 text-white text-[9px] font-bold flex items-center gap-1">
+                              <Check className="w-2.5 h-2.5" />
+                              <span>Aktif</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {/* 2. Kemenag Kalteng */}
+                        <div 
+                          onClick={() => setBrandingForm({ ...brandingForm, logoType: 'kemenag-kalteng' })}
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center text-center space-y-2 ${
+                            brandingForm.logoType === 'kemenag-kalteng'
+                              ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/30'
+                              : 'border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <OfficialEmblem size={46} logoType="kemenag-kalteng" />
+                          <div>
+                            <div className="font-bold text-slate-900 text-xs">Kemenag Kalteng</div>
+                            <div className="text-[10px] text-slate-500">Pita Kalteng Beramal</div>
+                          </div>
+                          {brandingForm.logoType === 'kemenag-kalteng' && (
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-800 text-white text-[9px] font-bold flex items-center gap-1">
+                              <Check className="w-2.5 h-2.5" />
+                              <span>Aktif</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {/* 3. Pemkab Murung Raya */}
+                        <div 
+                          onClick={() => setBrandingForm({ ...brandingForm, logoType: 'pemkab-mura' })}
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center text-center space-y-2 ${
+                            brandingForm.logoType === 'pemkab-mura'
+                              ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/30'
+                              : 'border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <OfficialEmblem size={46} logoType="pemkab-mura" />
+                          <div>
+                            <div className="font-bold text-slate-900 text-xs">Pemkab Murung Raya</div>
+                            <div className="text-[10px] text-slate-500">Talawang Tira Tangka Balang</div>
+                          </div>
+                          {brandingForm.logoType === 'pemkab-mura' && (
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-800 text-white text-[9px] font-bold flex items-center gap-1">
+                              <Check className="w-2.5 h-2.5" />
+                              <span>Aktif</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {/* 4. Custom URL */}
+                        <div 
+                          onClick={() => setBrandingForm({ ...brandingForm, logoType: 'custom' })}
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center text-center space-y-2 ${
+                            brandingForm.logoType === 'custom'
+                              ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/30'
+                              : 'border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="w-11 h-11 rounded-xl bg-slate-200 flex items-center justify-center text-slate-500">
+                            <ImageIcon className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <div className="font-bold text-slate-900 text-xs">Kustom Link URL Logo</div>
+                            <div className="text-[10px] text-slate-500">Gunakan URL Logo Mandiri</div>
+                          </div>
+                          {brandingForm.logoType === 'custom' && (
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-800 text-white text-[9px] font-bold flex items-center gap-1">
+                              <Check className="w-2.5 h-2.5" />
+                              <span>Aktif</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {brandingForm.logoType === 'custom' && (
+                        <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                          <label className="block text-xs font-semibold text-slate-700">
+                            Masukkan URL / Tautan Gambar Logo:
+                          </label>
+                          <input
+                            type="url"
+                            value={brandingForm.customLogoUrl || ''}
+                            onChange={(e) => setBrandingForm({ ...brandingForm, customLogoUrl: e.target.value })}
+                            placeholder="https://contoh.go.id/logo-kemenag.png"
+                            className="w-full p-2.5 border border-slate-300 rounded-lg text-xs font-mono"
+                          />
+                          <p className="text-[10px] text-slate-500">
+                            Pastikan format gambar berupa PNG/SVG transparan atau WebP.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Section B: Pilihan Tema Header Web */}
+                    <div className="space-y-3 pt-2">
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900">Pilihan Tema Header Web</h3>
+                        <p className="text-xs text-slate-500">Sesuaikan skema warna header portal resmi.</p>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
+                        {/* Emerald Classic */}
+                        <div
+                          onClick={() => setBrandingForm({ ...brandingForm, headerTheme: 'emerald' })}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                            brandingForm.headerTheme === 'emerald'
+                              ? 'border-emerald-600 bg-emerald-50 ring-2 ring-emerald-600/30'
+                              : 'border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="w-full h-7 rounded-lg bg-emerald-900 flex items-center justify-center text-white text-[10px] font-bold mb-2">
+                            #044326
+                          </div>
+                          <div className="font-bold text-slate-900 text-xs text-center">Hijau Klasik</div>
+                          <div className="text-[10px] text-slate-500 text-center">Resmi Kemenag</div>
+                        </div>
+
+                        {/* Navy Blue */}
+                        <div
+                          onClick={() => setBrandingForm({ ...brandingForm, headerTheme: 'navy' })}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                            brandingForm.headerTheme === 'navy'
+                              ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-600/30'
+                              : 'border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="w-full h-7 rounded-lg bg-slate-900 flex items-center justify-center text-sky-200 text-[10px] font-bold mb-2">
+                            #0f172a
+                          </div>
+                          <div className="font-bold text-slate-900 text-xs text-center">Biru Bahari</div>
+                          <div className="text-[10px] text-slate-500 text-center">Modern & Tegas</div>
+                        </div>
+
+                        {/* Forest Borneo */}
+                        <div
+                          onClick={() => setBrandingForm({ ...brandingForm, headerTheme: 'forest' })}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                            brandingForm.headerTheme === 'forest'
+                              ? 'border-teal-600 bg-teal-50 ring-2 ring-teal-600/30'
+                              : 'border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="w-full h-7 rounded-lg bg-[#022c22] flex items-center justify-center text-emerald-200 text-[10px] font-bold mb-2">
+                            #022c22
+                          </div>
+                          <div className="font-bold text-slate-900 text-xs text-center">Zamrud Borneo</div>
+                          <div className="text-[10px] text-slate-500 text-center">Hutan Asri Mura</div>
+                        </div>
+
+                        {/* Maroon BerAKHLAK */}
+                        <div
+                          onClick={() => setBrandingForm({ ...brandingForm, headerTheme: 'maroon' })}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                            brandingForm.headerTheme === 'maroon'
+                              ? 'border-rose-600 bg-rose-50 ring-2 ring-rose-600/30'
+                              : 'border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="w-full h-7 rounded-lg bg-[#3b0707] flex items-center justify-center text-amber-200 text-[10px] font-bold mb-2">
+                            #3b0707
+                          </div>
+                          <div className="font-bold text-slate-900 text-xs text-center">Marun ASN</div>
+                          <div className="text-[10px] text-slate-500 text-center">BerAKHLAK</div>
+                        </div>
+
+                        {/* Custom Color */}
+                        <div
+                          onClick={() => setBrandingForm({ ...brandingForm, headerTheme: 'custom' })}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                            brandingForm.headerTheme === 'custom'
+                              ? 'border-purple-600 bg-purple-50 ring-2 ring-purple-600/30'
+                              : 'border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div 
+                            className="w-full h-7 rounded-lg flex items-center justify-center text-white text-[10px] font-bold mb-2"
+                            style={{ backgroundColor: brandingForm.customHeaderColor || '#064e3b' }}
+                          >
+                            {brandingForm.customHeaderColor || '#064e3b'}
+                          </div>
+                          <div className="font-bold text-slate-900 text-xs text-center">Kustom Hex</div>
+                          <div className="text-[10px] text-slate-500 text-center">Pilih Warna Bebas</div>
+                        </div>
+                      </div>
+
+                      {brandingForm.headerTheme === 'custom' && (
+                        <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center gap-3">
+                          <input
+                            type="color"
+                            value={brandingForm.customHeaderColor || '#064e3b'}
+                            onChange={(e) => setBrandingForm({ ...brandingForm, customHeaderColor: e.target.value })}
+                            className="w-10 h-10 rounded-lg cursor-pointer border-0"
+                          />
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-700">Kode Warna Hex:</label>
+                            <input
+                              type="text"
+                              value={brandingForm.customHeaderColor || '#064e3b'}
+                              onChange={(e) => setBrandingForm({ ...brandingForm, customHeaderColor: e.target.value })}
+                              className="px-2 py-1 border border-slate-300 rounded font-mono text-xs uppercase"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Section C: Teks Branding Header */}
+                    <div className="space-y-3 pt-2">
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900">Teks Judul & Tagline Header</h3>
+                        <p className="text-xs text-slate-500">Teks identitas yang tampil di samping lambang instansi.</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <label className="block font-semibold text-slate-700 mb-1">Nama Instansi Baris 1</label>
+                          <input
+                            type="text"
+                            value={brandingForm.namaInstansi}
+                            onChange={(e) => setBrandingForm({ ...brandingForm, namaInstansi: e.target.value })}
+                            className="w-full p-2.5 border border-slate-300 rounded-lg uppercase"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-semibold text-slate-700 mb-1">Nama Daerah Baris 2</label>
+                          <input
+                            type="text"
+                            value={brandingForm.subInstansi}
+                            onChange={(e) => setBrandingForm({ ...brandingForm, subInstansi: e.target.value })}
+                            className="w-full p-2.5 border border-slate-300 rounded-lg uppercase"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="block font-semibold text-slate-700 mb-1">Tagline / Motto Instansi</label>
+                          <input
+                            type="text"
+                            value={brandingForm.tagline}
+                            onChange={(e) => setBrandingForm({ ...brandingForm, tagline: e.target.value })}
+                            className="w-full p-2.5 border border-slate-300 rounded-lg"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-white bg-emerald-800 hover:bg-emerald-900 rounded-xl shadow-md transition-all"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>Simpan & Terapkan Perubahan Logo & Tema Header</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* SUB-TAB 2: KELOLA AKUN LOGIN PEGAWAI */}
+                {activePengaturanSubTab === 'akun' && (
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900">
+                          Daftar Akun Login Pegawai & Hak Akses Portal
+                        </h3>
+                        <p className="text-xs text-slate-500">
+                          Kelola kredensial login (Super Admin, Humas, dan Operator Seksi Teknis).
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleOpenAddAccount}
+                        className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-emerald-800 hover:bg-emerald-900 rounded-lg shadow-xs transition-colors self-start sm:self-auto"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Tambah Akun Pegawai</span>
+                      </button>
+                    </div>
+
+                    {/* Quick Stats on Accounts */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <div className="text-[10px] text-slate-500 font-medium">Total Akun</div>
+                        <div className="text-lg font-black text-slate-900 mt-0.5">{adminUsersList.length}</div>
+                      </div>
+                      <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200">
+                        <div className="text-[10px] text-emerald-800 font-medium">Admin Super</div>
+                        <div className="text-lg font-black text-emerald-900 mt-0.5">
+                          {adminUsersList.filter(a => a.roleType === 'super_admin').length}
+                        </div>
+                      </div>
+                      <div className="p-3 bg-purple-50/70 rounded-xl border border-purple-200">
+                        <div className="text-[10px] text-purple-800 font-medium">Humas & Warta</div>
+                        <div className="text-lg font-black text-purple-900 mt-0.5">
+                          {adminUsersList.filter(a => a.roleType === 'humas').length}
+                        </div>
+                      </div>
+                      <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-200">
+                        <div className="text-[10px] text-blue-800 font-medium">Operator Seksi</div>
+                        <div className="text-lg font-black text-blue-900 mt-0.5">
+                          {adminUsersList.filter(a => a.roleType === 'operator_seksi').length}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Table of Accounts */}
+                    <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <th className="p-3">Nama Pegawai & NIP</th>
+                            <th className="p-3">Username Login</th>
+                            <th className="p-3">Peran / Hak Akses</th>
+                            <th className="p-3">Seksi Binaan</th>
+                            <th className="p-3">Kata Sandi</th>
+                            <th className="p-3 text-center">Status</th>
+                            <th className="p-3 text-right w-24">Aksi</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {adminUsersList.map((acc) => {
+                            const showPw = showPasswordMap[acc.id] || false;
+                            return (
+                              <tr key={acc.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="p-3">
+                                  <div className="font-bold text-slate-900">{acc.nama}, {acc.gelar}</div>
+                                  <div className="text-[11px] font-mono text-slate-500">NIP: {acc.nip}</div>
+                                  <div className="text-[10px] text-slate-400">{acc.email}</div>
+                                </td>
+                                <td className="p-3">
+                                  <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">
+                                    {acc.username}
+                                  </span>
+                                </td>
+                                <td className="p-3">
+                                  <span className={`px-2 py-0.5 rounded-md font-semibold text-[10px] inline-flex items-center gap-1 ${
+                                    acc.roleType === 'super_admin' ? 'bg-emerald-100 text-emerald-900' :
+                                    acc.roleType === 'humas' ? 'bg-purple-100 text-purple-900' : 'bg-blue-100 text-blue-900'
+                                  }`}>
+                                    {acc.roleType === 'super_admin' ? <ShieldCheck className="w-3 h-3" /> :
+                                     acc.roleType === 'humas' ? <Newspaper className="w-3 h-3" /> : <Users className="w-3 h-3" />}
+                                    <span>{acc.roleLabel}</span>
+                                  </span>
+                                </td>
+                                <td className="p-3 text-slate-600 font-medium">
+                                  {acc.seksiLabel || 'Semua Modul'}
+                                </td>
+                                <td className="p-3 font-mono">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-slate-700 text-xs">
+                                      {showPw ? (acc.password || 'kemenagmura2026') : '••••••••'}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => setShowPasswordMap({ ...showPasswordMap, [acc.id]: !showPw })}
+                                      className="text-slate-400 hover:text-slate-700 p-0.5"
+                                      title={showPw ? 'Sembunyikan' : 'Lihat Sandi'}
+                                    >
+                                      <Eye className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                </td>
+                                <td className="p-3 text-center">
+                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                    acc.isActive !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                                  }`}>
+                                    {acc.isActive !== false ? 'Aktif' : 'Nonaktif'}
+                                  </span>
+                                </td>
+                                <td className="p-3 text-right whitespace-nowrap">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenEditAccount(acc)}
+                                    className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded transition-colors mr-1"
+                                    title="Edit Akun"
+                                  >
+                                    <Edit3 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteAccount(acc)}
+                                    disabled={acc.id === currentUser.id}
+                                    className={`p-1.5 rounded transition-colors ${
+                                      acc.id === currentUser.id 
+                                        ? 'text-slate-300 cursor-not-allowed' 
+                                        : 'text-slate-400 hover:text-rose-700 hover:bg-rose-50'
+                                    }`}
+                                    title={acc.id === currentUser.id ? 'Akun Anda saat ini' : 'Hapus Akun'}
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* SUB-TAB 3: KONTAK & TAUTAN LAYANAN */}
+                {activePengaturanSubTab === 'kontak' && (
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      setPortalConfig(brandingForm);
+                      addAuditLog('Simpan Kontak', 'Pengaturan', 'Memperbarui profil kontak kedinasan');
+                      showToast('Pengaturan kontak kedinasan berhasil disimpan.');
+                    }}
+                    className="space-y-4 text-xs max-w-xl"
+                  >
+                    <div>
+                      <label className="block text-slate-700 font-semibold mb-1">Alamat Kantor Kemenag</label>
+                      <input
+                        type="text"
+                        value={brandingForm.alamat}
+                        onChange={(e) => setBrandingForm({ ...brandingForm, alamat: e.target.value })}
+                        className="w-full p-2.5 border border-slate-300 rounded-xl"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-slate-700 font-semibold mb-1">Telepon Kedinasan</label>
+                        <input
+                          type="text"
+                          value={brandingForm.telepon}
+                          onChange={(e) => setBrandingForm({ ...brandingForm, telepon: e.target.value })}
+                          className="w-full p-2.5 border border-slate-300 rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 font-semibold mb-1">Email Resmi</label>
+                        <input
+                          type="email"
+                          value={brandingForm.email}
+                          onChange={(e) => setBrandingForm({ ...brandingForm, email: e.target.value })}
+                          className="w-full p-2.5 border border-slate-300 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 font-semibold mb-1">Tautan Aplikasi PTSP Online</label>
+                      <input
+                        type="text"
+                        value={brandingForm.ptspUrl}
+                        onChange={(e) => setBrandingForm({ ...brandingForm, ptspUrl: e.target.value })}
+                        className="w-full p-2.5 border border-slate-300 rounded-xl font-mono text-[11px]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-700 font-semibold mb-1">Tautan SI PENDIS MURA</label>
+                      <input
+                        type="text"
+                        value={brandingForm.sipendisUrl}
+                        onChange={(e) => setBrandingForm({ ...brandingForm, sipendisUrl: e.target.value })}
+                        className="w-full p-2.5 border border-slate-300 rounded-xl font-mono text-[11px]"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-emerald-800 hover:bg-emerald-900 rounded-xl shadow-xs"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Simpan Kontak & Tautan</span>
+                    </button>
+                  </form>
+                )}
+
               </div>
             )}
 
@@ -2058,6 +2957,355 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: TAMBAH / EDIT AKUN LOGIN PEGAWAI */}
+      {isAccountModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-lg w-full my-8 p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-emerald-800" />
+                <h3 className="text-base font-bold text-slate-900">
+                  {editingAccount ? 'Edit Akun Login Pegawai' : 'Tambah Akun Login Pegawai Baru'}
+                </h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsAccountModalOpen(false)} 
+                className="text-slate-400 hover:text-slate-600 p-1 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveAccount} className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Nama Lengkap *</label>
+                  <input
+                    type="text"
+                    required
+                    value={accountFormData.nama || ''}
+                    onChange={(e) => setAccountFormData({ ...accountFormData, nama: e.target.value })}
+                    placeholder="Contoh: Muhammad Ridwan"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Gelar Akademik</label>
+                  <input
+                    type="text"
+                    value={accountFormData.gelar || ''}
+                    onChange={(e) => setAccountFormData({ ...accountFormData, gelar: e.target.value })}
+                    placeholder="Contoh: S.AP / M.Pd"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Username Login *</label>
+                  <input
+                    type="text"
+                    required
+                    value={accountFormData.username || ''}
+                    onChange={(e) => setAccountFormData({ ...accountFormData, username: e.target.value })}
+                    placeholder="op_kepegawaian"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg font-mono text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Kata Sandi (Password) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={accountFormData.password || 'kemenagmura2026'}
+                    onChange={(e) => setAccountFormData({ ...accountFormData, password: e.target.value })}
+                    placeholder="kemenagmura2026"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg font-mono text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">NIP (18 Digit)</label>
+                  <input
+                    type="text"
+                    value={accountFormData.nip || ''}
+                    onChange={(e) => setAccountFormData({ ...accountFormData, nip: e.target.value })}
+                    placeholder="198811052014021003"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg font-mono text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Email Resmi</label>
+                  <input
+                    type="email"
+                    value={accountFormData.email || ''}
+                    onChange={(e) => setAccountFormData({ ...accountFormData, email: e.target.value })}
+                    placeholder="nama@kemenagmura.go.id"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-semibold mb-1">Jabatan Kedinasan</label>
+                <input
+                  type="text"
+                  value={accountFormData.jabatan || ''}
+                  onChange={(e) => setAccountFormData({ ...accountFormData, jabatan: e.target.value })}
+                  placeholder="Pengelola Kepegawaian Subbag TU"
+                  className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Peran / Hak Akses *</label>
+                  <select
+                    value={accountFormData.roleType || 'operator_seksi'}
+                    onChange={(e) => setAccountFormData({ ...accountFormData, roleType: e.target.value as any })}
+                    className="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-xs"
+                  >
+                    <option value="super_admin">Admin Super (Akses Penuh)</option>
+                    <option value="humas">Humas & Protokoler (Berita & Galeri)</option>
+                    <option value="operator_seksi">Operator Seksi Teknis</option>
+                  </select>
+                </div>
+
+                {accountFormData.roleType === 'operator_seksi' && (
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">Seksi Binaan *</label>
+                    <select
+                      value={accountFormData.operatorSeksi || 'kepegawaian'}
+                      onChange={(e) => setAccountFormData({ ...accountFormData, operatorSeksi: e.target.value as any })}
+                      className="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-xs"
+                    >
+                      <option value="kepegawaian">Kepegawaian & Tata Usaha</option>
+                      <option value="pendis">Seksi Pendidikan Islam</option>
+                      <option value="bimas-islam">Seksi Bimas Islam & KUA</option>
+                      <option value="bimas-kristen">Penyelenggara Bimas Kristen</option>
+                      <option value="bimas-hindu">Penyelenggara Bimas Hindu</option>
+                      <option value="bimas-budha">Penyelenggara Bimas Budha</option>
+                      <option value="phu">Seksi Haji & Umrah (PHU)</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="acc-active-check"
+                  checked={accountFormData.isActive !== false}
+                  onChange={(e) => setAccountFormData({ ...accountFormData, isActive: e.target.checked })}
+                  className="rounded text-emerald-800"
+                />
+                <label htmlFor="acc-active-check" className="text-slate-700 font-medium cursor-pointer">
+                  Akun Login Aktif (Dapat digunakan untuk masuk portal)
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsAccountModalOpen(false)}
+                  className="px-4 py-2 font-medium text-slate-600 hover:text-slate-900"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 font-semibold text-white bg-emerald-800 hover:bg-emerald-900 rounded-lg shadow-xs"
+                >
+                  Simpan Akun
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: TAMBAH / EDIT DATA PEGAWAI SEMUA BIDANG */}
+      {isPegawaiModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-xl w-full my-8 p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-emerald-800" />
+                <h3 className="text-base font-bold text-slate-900">
+                  {editingPegawai ? 'Edit Data Pegawai' : 'Tambah Data Pegawai Baru (Semua Bidang)'}
+                </h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsPegawaiModalOpen(false)} 
+                className="text-slate-400 hover:text-slate-600 p-1 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePegawai} className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">NIP Pegawai *</label>
+                  <input
+                    type="text"
+                    required
+                    value={pegawaiFormData.nip || ''}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, nip: e.target.value })}
+                    placeholder="198811052014021003"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg font-mono text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Nama Lengkap *</label>
+                  <input
+                    type="text"
+                    required
+                    value={pegawaiFormData.nama || ''}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, nama: e.target.value })}
+                    placeholder="Nama tanpa gelar..."
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Gelar Akademik</label>
+                  <input
+                    type="text"
+                    value={pegawaiFormData.gelar || ''}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, gelar: e.target.value })}
+                    placeholder="S.Ag., M.Pd.I / S.Kom"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Jabatan Kedinasan *</label>
+                  <input
+                    type="text"
+                    required
+                    value={pegawaiFormData.jabatan || ''}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, jabatan: e.target.value })}
+                    placeholder="Contoh: Pengelola Kepegawaian / Analis"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Bidang / Unit Kerja *</label>
+                  <select
+                    value={pegawaiFormData.unitKerja || 'Subbag TU'}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, unitKerja: e.target.value })}
+                    className="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-xs"
+                  >
+                    <option value="Pimpinan">Pimpinan Kantor</option>
+                    <option value="Subbag TU">Subbag Tata Usaha / Kepegawaian</option>
+                    <option value="Seksi Pendidikan Islam">Seksi Pendidikan Islam (Pendis)</option>
+                    <option value="Seksi Bimas Islam">Seksi Bimas Islam & KUA</option>
+                    <option value="Penyelenggara Bimas Kristen">Penyelenggara Bimas Kristen</option>
+                    <option value="Penyelenggara Bimas Hindu">Penyelenggara Bimas Hindu</option>
+                    <option value="Penyelenggara Bimas Budha">Penyelenggara Bimas Budha</option>
+                    <option value="Seksi PHU">Seksi Penyelenggaraan Haji dan Umrah (PHU)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Status Kepegawaian *</label>
+                  <select
+                    value={pegawaiFormData.status || 'PNS'}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, status: e.target.value as any })}
+                    className="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-xs"
+                  >
+                    <option value="PNS">PNS (Pegawai Negeri Sipil)</option>
+                    <option value="PPPK">PPPK (Pegawai Pemerintah Perjanjian Kerja)</option>
+                    <option value="PPNPN">PPNPN (Non-ASN)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Golongan / Ruang</label>
+                  <input
+                    type="text"
+                    value={pegawaiFormData.golongan || ''}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, golongan: e.target.value })}
+                    placeholder="IV/b, III/c, IX, dll"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg font-mono text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Pendidikan Terakhir</label>
+                  <input
+                    type="text"
+                    value={pegawaiFormData.pendidikanTerakhir || ''}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, pendidikanTerakhir: e.target.value })}
+                    placeholder="S1 Manajemen / S2 PAI"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Masa Kerja (Tahun)</label>
+                  <input
+                    type="number"
+                    value={pegawaiFormData.masaKerjaTahun ?? 5}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, masaKerjaTahun: Number(e.target.value) })}
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Nomor Kontak / WhatsApp</label>
+                  <input
+                    type="text"
+                    value={pegawaiFormData.kontak || ''}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, kontak: e.target.value })}
+                    placeholder="081234567890"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Email Kedinasan</label>
+                  <input
+                    type="email"
+                    value={pegawaiFormData.email || ''}
+                    onChange={(e) => setPegawaiFormData({ ...pegawaiFormData, email: e.target.value })}
+                    placeholder="pegawai@kemenag.go.id"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPegawaiModalOpen(false)}
+                  className="px-4 py-2 font-medium text-slate-600 hover:text-slate-900"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 font-semibold text-white bg-emerald-800 hover:bg-emerald-900 rounded-lg shadow-xs"
+                >
+                  Simpan Data Pegawai
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
