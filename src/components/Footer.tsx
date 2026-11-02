@@ -49,7 +49,7 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="space-y-2.5 text-xs text-slate-400">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>Jl. Jenderal Sudirman No. 12, Kompleks Perkantoran Pemkab Murung Raya, Puruk Cahu 73911, Kalimantan Tengah</span>
+                <span>Jl. Jenderal Sudirman No. 12, Kompleks Perkantoran Pemkab Murung Raya, Puruk Cahu 73911</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -221,7 +221,7 @@ export const Footer: React.FC<FooterProps> = ({
         {/* Bottom Bar */}
         <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div>
-            © {new Date().getFullYear()} Kantor Kementerian Agama Kabupaten Murung Raya, Kalimantan Tengah. Hak cipta dilindungi.
+            © {new Date().getFullYear()} Kantor Kementerian Agama Kabupaten Murung Raya. Hak cipta dilindungi.
           </div>
           <div className="flex items-center gap-4">
             <span>Standar Pelayanan Publik</span>
@@ -229,18 +229,6 @@ export const Footer: React.FC<FooterProps> = ({
             <span>Keterbukaan Informasi Publik (KIP)</span>
             <span>·</span>
             <span>Satu Data Kemenag</span>
-            <span>·</span>
-            <button
-              type="button"
-              onClick={onOpenAdmin}
-              className="text-slate-400 hover:text-emerald-300 font-mono text-[11px] bg-slate-800/90 hover:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700 hover:border-emerald-500/50 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs group"
-              title="Klik di sini atau tekan kombinasi Ctrl + Shift + A untuk membuka dialog Login Administrator"
-            >
-              <span className="group-hover:text-slate-200">Pintasan Pengelola:</span>
-              <kbd className="text-emerald-400 group-hover:text-emerald-300 font-semibold bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700">
-                Ctrl + Shift + A
-              </kbd>
-            </button>
           </div>
         </div>
       </div>

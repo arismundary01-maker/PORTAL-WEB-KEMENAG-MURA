@@ -1,4 +1,7 @@
+import React, { useState } from 'react';
 import { LogoType } from '../types/admin';
+
+export const OFFICIAL_KEMENAG_LOGO_URL = '/assets/aistudio/Kementerian_Agama_new_logo_f9b3eec1.png';
 
 interface OfficialEmblemProps {
   className?: string;
@@ -13,6 +16,8 @@ export const OfficialEmblem: React.FC<OfficialEmblemProps> = ({
   logoType = 'kemenag-ri',
   customLogoUrl
 }) => {
+  const [imageError, setImageError] = useState(false);
+
   // If custom logo URL is specified
   if (logoType === 'custom' && customLogoUrl) {
     return (
@@ -21,11 +26,27 @@ export const OfficialEmblem: React.FC<OfficialEmblemProps> = ({
         alt="Logo Kemenag Murung Raya"
         width={size}
         height={size}
+        style={{ width: `${size}px`, height: `${size}px` }}
         className={`object-contain rounded-lg shrink-0 ${className}`}
         onError={(e) => {
-          // fallback if image link fails
           (e.currentTarget as HTMLElement).style.display = 'none';
         }}
+      />
+    );
+  }
+
+  // Official Kementerian Agama RI Logo (Uploaded new official logo)
+  if (logoType === 'kemenag-ri' && !imageError) {
+    return (
+      <img
+        src={OFFICIAL_KEMENAG_LOGO_URL}
+        alt="Logo Resmi Kementerian Agama Republik Indonesia"
+        width={size}
+        height={size}
+        style={{ width: `${size}px`, height: `${size}px` }}
+        className={`object-contain shrink-0 filter drop-shadow-xs transition-transform duration-200 ${className}`}
+        loading="eager"
+        onError={() => setImageError(true)}
       />
     );
   }

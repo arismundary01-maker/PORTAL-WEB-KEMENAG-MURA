@@ -3,14 +3,14 @@ import { AdminUser, AuditLog, PtspPermohonan, PortalConfig } from '../types/admi
 export const DEFAULT_PORTAL_CONFIG: PortalConfig = {
   namaInstansi: "KEMENTERIAN AGAMA",
   subInstansi: "KABUPATEN MURUNG RAYA",
-  tagline: "Provinsi Kalimantan Tengah · Ikhlas Beramal",
+  tagline: "Ikhlas Beramal",
   telepon: "(0528) 31445",
   email: "kemenag.murungraya@kemenag.go.id",
   alamat: "Jl. Jenderal Sudirman No. 12, Kompleks Perkantoran Pemkab, Puruk Cahu 73911",
   ptspUrl: "https://ptsp-kemenag-mura.vercel.app/",
   sipendisUrl: "https://sipendismura.my.id",
   logoType: "kemenag-ri",
-  customLogoUrl: "",
+  customLogoUrl: "/assets/aistudio/Kementerian_Agama_new_logo_f9b3eec1.png",
   headerTheme: "emerald",
   customHeaderColor: "#064e3b"
 };

@@ -14,7 +14,7 @@ import {
 
 export const PROFIL_DATA = {
   namaKantor: "Kantor Kementerian Agama Kabupaten Murung Raya",
-  wilayah: "Kabupaten Murung Raya, Provinsi Kalimantan Tengah",
+  wilayah: "Kabupaten Murung Raya",
   ibuKota: "Puruk Cahu",
   alamat: "Jl. Jenderal Sudirman No. 12, Kompleks Perkantoran Pemkab, Puruk Cahu 73911",
   telepon: "(0528) 31445",
