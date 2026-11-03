@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Berita, Pengumuman, NavigationTab, ProfilSubTab, DataSectorTab, GaleriKegiatan } from '../types';
 import { 
   Building2, 
@@ -15,7 +15,8 @@ import {
   Award,
   Clock,
   Sparkles,
-  Camera
+  Camera,
+  RefreshCw
 } from 'lucide-react';
 
 interface BerandaSectionProps {
@@ -41,6 +42,106 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
   onViewPengumuman,
   onOpenPtspModal
 }) => {
+  const [heroAnimKey, setHeroAnimKey] = useState(0);
+
+  // Typewriter sequential typing state (100% letter-by-letter typing)
+  const FULL_LINE_1 = "Layanan";
+  const FULL_LINE_2 = "Kementerian Agama";
+  const FULL_LINE_3 = "Kabupaten Murung Raya";
+
+  const [typedLine1, setTypedLine1] = useState('');
+  const [typedLine2, setTypedLine2] = useState('');
+  const [typedLine3, setTypedLine3] = useState('');
+  const [currentActiveLine, setCurrentActiveLine] = useState<1 | 2 | 3 | 'done'>(1);
+
+  useEffect(() => {
+    let isCancelled = false;
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const runContinuousTypewriter = async () => {
+      // Loop continuously letter-by-letter
+      while (!isCancelled) {
+        setTypedLine1('');
+        setTypedLine2('');
+        setTypedLine3('');
+        setCurrentActiveLine(1);
+
+        await sleep(200);
+        if (isCancelled) break;
+
+        // Line 1: "Layanan" - letter by letter
+        setCurrentActiveLine(1);
+        for (let i = 1; i <= FULL_LINE_1.length; i++) {
+          if (isCancelled) break;
+          setTypedLine1(FULL_LINE_1.slice(0, i));
+          await sleep(90);
+        }
+
+        if (isCancelled) break;
+        await sleep(160);
+
+        // Line 2: "Kementerian Agama" - letter by letter
+        setCurrentActiveLine(2);
+        for (let i = 1; i <= FULL_LINE_2.length; i++) {
+          if (isCancelled) break;
+          setTypedLine2(FULL_LINE_2.slice(0, i));
+          await sleep(75);
+        }
+
+        if (isCancelled) break;
+        await sleep(160);
+
+        // Line 3: "Kabupaten Murung Raya" - letter by letter
+        setCurrentActiveLine(3);
+        for (let i = 1; i <= FULL_LINE_3.length; i++) {
+          if (isCancelled) break;
+          setTypedLine3(FULL_LINE_3.slice(0, i));
+          await sleep(70);
+        }
+
+        if (isCancelled) break;
+        setCurrentActiveLine('done');
+
+        // Pause so readers can comfortably read the full text
+        await sleep(2600);
+        if (isCancelled) break;
+
+        // Backspace smoothly in reverse order: Line 3 -> Line 2 -> Line 1
+        setCurrentActiveLine(3);
+        for (let i = FULL_LINE_3.length - 1; i >= 0; i--) {
+          if (isCancelled) break;
+          setTypedLine3(FULL_LINE_3.slice(0, i));
+          await sleep(25);
+        }
+
+        if (isCancelled) break;
+        setCurrentActiveLine(2);
+        for (let i = FULL_LINE_2.length - 1; i >= 0; i--) {
+          if (isCancelled) break;
+          setTypedLine2(FULL_LINE_2.slice(0, i));
+          await sleep(25);
+        }
+
+        if (isCancelled) break;
+        setCurrentActiveLine(1);
+        for (let i = FULL_LINE_1.length - 1; i >= 0; i--) {
+          if (isCancelled) break;
+          setTypedLine1(FULL_LINE_1.slice(0, i));
+          await sleep(25);
+        }
+
+        if (isCancelled) break;
+        await sleep(350);
+      }
+    };
+
+    runContinuousTypewriter();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [heroAnimKey]);
+
   const featuredBerita = beritaList[0];
   const secondaryBerita = beritaList.slice(1, 4);
   const latestPengumuman = pengumumanList.slice(0, 3);
@@ -74,13 +175,114 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
             <div className="absolute bottom-20 left-0 w-80 h-80 bg-teal-200/25 rounded-full blur-2xl pointer-events-none -ml-20" />
 
             {/* Top Sub-Header: Greetings & Title */}
-            <div className="relative z-10 pt-8 sm:pt-12 px-6 sm:px-12 text-center max-w-4xl mx-auto space-y-3">
-              <span className="font-serif italic text-2xl sm:text-3xl lg:text-4xl text-[#0b5133] tracking-wide font-medium block">
-                Selamat Datang di
-              </span>
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-                Layanan Kementerian Agama
+            <div className="relative z-10 pt-8 sm:pt-12 px-4 sm:px-12 text-center max-w-5xl mx-auto space-y-3">
+              <style>{`
+                @keyframes kemenagLetterPop {
+                  0% {
+                    opacity: 0;
+                    transform: translateY(22px) scale(0.65);
+                    filter: blur(4px);
+                  }
+                  70% {
+                    opacity: 1;
+                    transform: translateY(-2px) scale(1.06);
+                    filter: blur(0px);
+                  }
+                  100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                    filter: blur(0px);
+                  }
+                }
+              `}</style>
+              
+              <div className="flex items-center justify-center gap-2.5">
+                <span className="font-serif italic text-2xl sm:text-3xl lg:text-4xl text-[#0b5133] tracking-wide font-medium">
+                  Selamat Datang di
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setHeroAnimKey(k => k + 1)}
+                  className="p-1.5 rounded-full text-emerald-800 hover:text-amber-800 hover:bg-emerald-50 bg-white border-2 border-emerald-400/50 hover:border-amber-400 transition-all hover:rotate-180 duration-500 shadow-2xs"
+                  title="Ketik ulang animasi huruf satu per satu"
+                  aria-label="Ketik ulang animasi huruf satu per satu"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 text-[#009b96]" />
+                </button>
+              </div>
+
+              {/* 3-Line Animated Header: True Letter-by-Letter Sequential Typewriter with Color #00FFF7 */}
+              <h1 
+                aria-label="Layanan Kementerian Agama Kabupaten Murung Raya"
+                className="flex flex-col items-center justify-center space-y-1 sm:space-y-2 py-1 select-none"
+              >
+                {/* Baris Pertama: Layanan */}
+                <div className="min-h-[2.5rem] sm:min-h-[3.5rem] lg:min-h-[4.25rem] text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-wider flex items-center justify-center flex-wrap leading-tight">
+                  {typedLine1.split('').map((char, idx) => (
+                    <span
+                      key={`l1-${idx}`}
+                      className="inline-block transition-transform duration-150 hover:scale-110"
+                      style={{
+                        color: '#00FFF7',
+                        WebkitTextStroke: '1.5px #02453b',
+                        paintOrder: 'stroke fill',
+                        textShadow: '0 0 12px rgba(0, 255, 247, 0.5), 0 2px 5px rgba(2, 69, 59, 0.4)',
+                        whiteSpace: char === ' ' ? 'pre' : 'normal',
+                      }}
+                    >
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                  ))}
+                  {currentActiveLine === 1 && (
+                    <span className="inline-block w-1.5 h-7 sm:h-11 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_12px_#00FFF7]" />
+                  )}
+                </div>
+
+                {/* Baris Kedua: Kementerian Agama */}
+                <div className="min-h-[2.5rem] sm:min-h-[3.5rem] lg:min-h-[4.25rem] text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight flex items-center justify-center flex-wrap leading-tight">
+                  {typedLine2.split('').map((char, idx) => (
+                    <span
+                      key={`l2-${idx}`}
+                      className="inline-block transition-transform duration-150 hover:scale-110"
+                      style={{
+                        color: '#00FFF7',
+                        WebkitTextStroke: '1.5px #02453b',
+                        paintOrder: 'stroke fill',
+                        textShadow: '0 0 12px rgba(0, 255, 247, 0.5), 0 2px 5px rgba(2, 69, 59, 0.4)',
+                        whiteSpace: char === ' ' ? 'pre' : 'normal',
+                      }}
+                    >
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                  ))}
+                  {currentActiveLine === 2 && (
+                    <span className="inline-block w-1.5 h-7 sm:h-11 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_12px_#00FFF7]" />
+                  )}
+                </div>
+
+                {/* Baris Ketiga: Kabupaten Murung Raya */}
+                <div className="min-h-[2rem] sm:min-h-[3rem] lg:min-h-[3.75rem] text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-wider flex items-center justify-center flex-wrap leading-tight">
+                  {typedLine3.split('').map((char, idx) => (
+                    <span
+                      key={`l3-${idx}`}
+                      className="inline-block transition-transform duration-150 hover:scale-110"
+                      style={{
+                        color: '#00FFF7',
+                        WebkitTextStroke: '1.5px #02453b',
+                        paintOrder: 'stroke fill',
+                        textShadow: '0 0 12px rgba(0, 255, 247, 0.5), 0 2px 5px rgba(2, 69, 59, 0.4)',
+                        whiteSpace: char === ' ' ? 'pre' : 'normal',
+                      }}
+                    >
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                  ))}
+                  {currentActiveLine === 3 && (
+                    <span className="inline-block w-1.5 h-6 sm:h-9 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_12px_#00FFF7]" />
+                  )}
+                </div>
               </h1>
+
               <div className="inline-block pt-1">
                 <span className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-[#0a5234] text-white text-xs sm:text-sm font-semibold tracking-wide shadow-md border-2 border-emerald-600/40">
                   <Sparkles className="w-4 h-4 text-amber-300" />

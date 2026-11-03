@@ -20,8 +20,12 @@ import {
   KuaKecamatan, 
   TempatIbadahKristen, 
   TempatIbadahHindu,
-  TempatIbadahBudha 
+  TempatIbadahBudha,
+  PejabatEselon,
+  ProfilData,
+  NilaiBudayaKerja
 } from '../../types';
+import { PROFIL_DATA, INITIAL_PEJABAT } from '../../data/mockData';
 import { OfficialEmblem } from '../OfficialEmblem';
 import { 
   LayoutDashboard, 
@@ -55,7 +59,12 @@ import {
   UserCheck,
   Check,
   ChevronRight,
-  Filter
+  Filter,
+  Award,
+  Target,
+  Compass,
+  Network,
+  UserPlus
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -91,6 +100,10 @@ interface AdminDashboardProps {
   setAuditLogs: React.Dispatch<React.SetStateAction<AuditLog[]>>;
   ptspRequests: PtspPermohonan[];
   setPtspRequests: React.Dispatch<React.SetStateAction<PtspPermohonan[]>>;
+  profilData?: ProfilData;
+  setProfilData?: React.Dispatch<React.SetStateAction<ProfilData>>;
+  pejabatList?: PejabatEselon[];
+  setPejabatList?: React.Dispatch<React.SetStateAction<PejabatEselon[]>>;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
@@ -124,7 +137,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   auditLogs,
   setAuditLogs,
   ptspRequests,
-  setPtspRequests
+  setPtspRequests,
+  profilData,
+  setProfilData,
+  pejabatList = [],
+  setPejabatList
 }) => {
   // Determine default tab based on user role
   const getDefaultTab = (): AdminTab => {
@@ -188,6 +205,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [isPegawaiModalOpen, setIsPegawaiModalOpen] = useState(false);
   const [editingPegawai, setEditingPegawai] = useState<Pegawai | null>(null);
   const [pegawaiFormData, setPegawaiFormData] = useState<Partial<Pegawai>>({});
+
+  // --- PROFIL KEMENAG EDIT & PEJABAT ESELON CRUD STATES ---
+  const activeProfil = profilData || PROFIL_DATA;
+  const activePejabatList = pejabatList.length > 0 ? pejabatList : INITIAL_PEJABAT;
+
+  const [activeProfilSubTab, setActiveProfilSubTab] = useState<'visi-misi' | 'struktur' | 'pejabat'>('visi-misi');
+  const [visiMisiForm, setVisiMisiForm] = useState<ProfilData>(activeProfil);
+  const [newMisiInput, setNewMisiInput] = useState('');
+
+  // Sync visiMisiForm when profilData changes
+  React.useEffect(() => {
+    if (profilData) {
+      setVisiMisiForm(profilData);
+    }
+  }, [profilData]);
+
+  // Pejabat Eselon Modal & Filter States
+  const [isPejabatModalOpen, setIsPejabatModalOpen] = useState(false);
+  const [editingPejabat, setEditingPejabat] = useState<PejabatEselon | null>(null);
+  const [pejabatFormData, setPejabatFormData] = useState<Partial<PejabatEselon>>({});
+  const [searchPejabatAdmin, setSearchPejabatAdmin] = useState('');
+  const [filterEselonAdmin, setFilterEselonAdmin] = useState<string>('all');
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -685,6 +724,111 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     showToast(`Data pegawai ${p.nama} berhasil dihapus.`);
   };
 
+  // --- PROFIL KEMENAG: VISI MISI & STRUKTUR HANDLERS ---
+  const handleSaveVisiMisi = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (setProfilData) {
+      setProfilData(visiMisiForm);
+    }
+    addAuditLog('Edit Profil Kemenag', 'Visi & Misi', 'Memperbarui visi, misi, motto, dan 5 nilai budaya kerja Kemenag');
+    showToast('Perubahan Visi, Misi & Budaya Kerja berhasil disimpan.');
+  };
+
+  const handleAddMisi = () => {
+    if (!newMisiInput.trim()) return;
+    setVisiMisiForm(prev => ({
+      ...prev,
+      misi: [...prev.misi, newMisiInput.trim()]
+    }));
+    setNewMisiInput('');
+    showToast('Butir misi baru ditambahkan.');
+  };
+
+  const handleDeleteMisi = (index: number) => {
+    setVisiMisiForm(prev => ({
+      ...prev,
+      misi: prev.misi.filter((_, idx) => idx !== index)
+    }));
+    showToast('Butir misi dihapus.');
+  };
+
+  const handleUpdateBudayaKerja = (index: number, field: keyof NilaiBudayaKerja, value: string) => {
+    setVisiMisiForm(prev => {
+      const updated = [...prev.nilaiBudayaKerja];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, nilaiBudayaKerja: updated };
+    });
+  };
+
+  const handleSaveStruktur = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (setProfilData) {
+      setProfilData(visiMisiForm);
+    }
+    addAuditLog('Edit Profil Kemenag', 'Struktur Organisasi', 'Memperbarui informasi dasar hukum dan struktur organisasi Kemenag');
+    showToast('Perubahan Struktur Organisasi berhasil disimpan.');
+  };
+
+  // --- DAFTAR PEJABAT ESELON CRUD HANDLERS ---
+  const handleOpenAddPejabat = () => {
+    setEditingPejabat(null);
+    setPejabatFormData({
+      eselon: 'Eselon IV/a',
+      pangkatGolongan: 'Penata Tingkat I (III/d)',
+      unitKerja: 'Seksi Pendidikan Islam',
+      kontakKedinasan: 'kemenag.mura@kemenag.go.id'
+    });
+    setIsPejabatModalOpen(true);
+  };
+
+  const handleOpenEditPejabat = (pej: PejabatEselon) => {
+    setEditingPejabat(pej);
+    setPejabatFormData({ ...pej });
+    setIsPejabatModalOpen(true);
+  };
+
+  const handleSavePejabat = (e: React.FormEvent) => {
+    e.preventDefault();
+    const nama = (pejabatFormData.nama || '').trim();
+    if (!nama) {
+      showToast('Nama pejabat wajib diisi.');
+      return;
+    }
+
+    if (editingPejabat && setPejabatList) {
+      setPejabatList(prev => prev.map(p => p.id === editingPejabat.id ? { ...p, ...pejabatFormData } as PejabatEselon : p));
+      addAuditLog('Edit Pejabat Eselon', 'Profil Kemenag', `Memperbarui pejabat ${nama} (${pejabatFormData.jabatan})`);
+      showToast(`Data pejabat ${nama} berhasil diperbarui.`);
+    } else if (setPejabatList) {
+      const newPej: PejabatEselon = {
+        id: `pej-${Date.now()}`,
+        nama,
+        gelar: pejabatFormData.gelar || 'S.Ag',
+        nip: pejabatFormData.nip || `198${Math.floor(10000000000000 + Math.random() * 9000000000000)}`,
+        jabatan: pejabatFormData.jabatan || 'Kepala Seksi',
+        eselon: (pejabatFormData.eselon as any) || 'Eselon IV/a',
+        pangkatGolongan: pejabatFormData.pangkatGolongan || 'Penata Tingkat I (III/d)',
+        unitKerja: pejabatFormData.unitKerja || 'Seksi Pendidikan Islam',
+        riwayatSingkat: pejabatFormData.riwayatSingkat || 'Aparatur sipil negara di lingkungan Kemenag Murung Raya.',
+        pendidikan: pejabatFormData.pendidikan || 'S1 Pendidikan Agama Islam',
+        kontakKedinasan: pejabatFormData.kontakKedinasan || 'kemenag.mura@kemenag.go.id',
+        fotoUrl: pejabatFormData.fotoUrl
+      };
+      setPejabatList(prev => [...prev, newPej]);
+      addAuditLog('Tambah Pejabat Eselon', 'Profil Kemenag', `Menambahkan pejabat eselon baru ${nama} (${newPej.jabatan})`);
+      showToast(`Pejabat baru ${nama} berhasil ditambahkan.`);
+    }
+    setIsPejabatModalOpen(false);
+  };
+
+  const handleDeletePejabat = (pej: PejabatEselon) => {
+    if (!setPejabatList) return;
+    if (!window.confirm(`Hapus data pejabat eselon: ${pej.nama}, ${pej.gelar} (${pej.jabatan})?`)) return;
+    setPejabatList(prev => prev.filter(p => p.id !== pej.id));
+    addAuditLog('Hapus Pejabat Eselon', 'Profil Kemenag', `Menghapus data pejabat eselon ${pej.nama}`);
+    showToast(`Pejabat ${pej.nama} telah dihapus dari daftar.`);
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col antialiased">
       
@@ -857,6 +1001,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       currentAdminTab === 'kelola-galeri' ? 'bg-emerald-900 text-emerald-200' : 'bg-slate-100 text-slate-600'
                     }`}>
                       {galeriList.length}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentAdminTab('kelola-profil')}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold rounded-xl transition-all ${
+                      currentAdminTab === 'kelola-profil'
+                        ? 'bg-emerald-800 text-white shadow-xs'
+                        : 'text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Building2 className="w-4 h-4 text-emerald-600" />
+                      <span>Profil Kemenag</span>
+                    </div>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
+                      currentAdminTab === 'kelola-profil' ? 'bg-emerald-900 text-emerald-200' : 'bg-slate-100 text-slate-600'
+                    }`}>
+                      {activePejabatList.length} Pejabat
                     </span>
                   </button>
                 </>
@@ -1068,6 +1231,516 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </table>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* KELOLA PROFIL KEMENAG (Visi Misi, Struktur, Pejabat Eselon) */}
+            {currentAdminTab === 'kelola-profil' && canAccessHumas && (
+              <div className="space-y-6 animate-fadeIn">
+                {/* Header & Sub-tab switcher */}
+                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div>
+                      <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1">
+                        <Building2 className="w-4 h-4 text-emerald-700" />
+                        <span>Manajemen Profil Instansi</span>
+                      </div>
+                      <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                        Pengaturan Profil Kantor Kementerian Agama
+                      </h2>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Kelola visi & misi, nilai budaya kerja, bagan struktur organisasi, dan daftar pejabat eselon.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={onViewPublicSite}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Pratinjau Halaman Profil</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Sub-tab segmented buttons */}
+                  <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-xl w-fit">
+                    <button
+                      type="button"
+                      onClick={() => setActiveProfilSubTab('visi-misi')}
+                      className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
+                        activeProfilSubTab === 'visi-misi'
+                          ? 'bg-white text-emerald-900 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Target className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>1. Visi, Misi & Budaya Kerja</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveProfilSubTab('struktur')}
+                      className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
+                        activeProfilSubTab === 'struktur'
+                          ? 'bg-white text-emerald-900 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Network className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>2. Struktur Organisasi</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveProfilSubTab('pejabat')}
+                      className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
+                        activeProfilSubTab === 'pejabat'
+                          ? 'bg-white text-emerald-900 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Users className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>3. Daftar Pejabat Eselon</span>
+                      <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono">
+                        {activePejabatList.length}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* SUB-PANEL 1: VISI, MISI & 5 NILAI BUDAYA KERJA */}
+                {activeProfilSubTab === 'visi-misi' && (
+                  <form onSubmit={handleSaveVisiMisi} className="space-y-6">
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-5">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                          <Target className="w-4 h-4 text-emerald-700" />
+                          <span>Visi Instansi Kementerian Agama</span>
+                        </div>
+                        <span className="text-xs text-slate-400">Periode Strategis 2025 - 2029</span>
+                      </div>
+
+                      <div className="space-y-4 text-xs">
+                        <div>
+                          <label className="block text-slate-700 font-semibold mb-1">
+                            Pernyataan Visi Kementerian Agama *
+                          </label>
+                          <textarea
+                            rows={3}
+                            required
+                            value={visiMisiForm.visi}
+                            onChange={(e) => setVisiMisiForm({ ...visiMisiForm, visi: e.target.value })}
+                            className="w-full p-3 border border-slate-300 rounded-xl text-xs leading-relaxed focus:ring-2 focus:ring-emerald-500"
+                            placeholder="Tuliskan rumusan visi..."
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-700 font-semibold mb-1">
+                              Motto Pelayanan Kemenag
+                            </label>
+                            <input
+                              type="text"
+                              value={visiMisiForm.motto || ''}
+                              onChange={(e) => setVisiMisiForm({ ...visiMisiForm, motto: e.target.value })}
+                              placeholder="Ikhlas Beramal"
+                              className="w-full p-2.5 border border-slate-300 rounded-lg text-xs font-semibold text-emerald-800"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-slate-700 font-semibold mb-1">
+                              Falsafah / Semboyan Daerah
+                            </label>
+                            <input
+                              type="text"
+                              value={visiMisiForm.semboyanDaerah || ''}
+                              onChange={(e) => setVisiMisiForm({ ...visiMisiForm, semboyanDaerah: e.target.value })}
+                              placeholder="Tira Tangka Balang (Maju Terus Pantang Mundur)"
+                              className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Misi Kemenag Manager */}
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                          <Compass className="w-4 h-4 text-emerald-700" />
+                          <span>Misi Strategis Kantor Kemenag Murung Raya</span>
+                        </div>
+                        <span className="text-xs text-slate-500">{visiMisiForm.misi.length} Butir Misi</span>
+                      </div>
+
+                      {/* Add new mission field */}
+                      <div className="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <input
+                          type="text"
+                          value={newMisiInput}
+                          onChange={(e) => setNewMisiInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddMisi();
+                            }
+                          }}
+                          placeholder="Ketik butir misi baru lalu klik Tambah..."
+                          className="flex-1 p-2 bg-white border border-slate-300 rounded-lg text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddMisi}
+                          className="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shrink-0"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Tambah Butir Misi</span>
+                        </button>
+                      </div>
+
+                      {/* Misi items list */}
+                      <div className="space-y-3">
+                        {visiMisiForm.misi.map((misiText, idx) => (
+                          <div key={idx} className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition-colors">
+                            <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                              {idx + 1}
+                            </span>
+                            <textarea
+                              rows={2}
+                              value={misiText}
+                              onChange={(e) => {
+                                const newMisi = [...visiMisiForm.misi];
+                                newMisi[idx] = e.target.value;
+                                setVisiMisiForm({ ...visiMisiForm, misi: newMisi });
+                              }}
+                              className="flex-1 p-2 border border-slate-200 rounded-lg text-xs text-slate-700 leading-relaxed focus:bg-slate-50"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMisi(idx)}
+                              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors shrink-0"
+                              title="Hapus butir misi ini"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 5 Nilai Budaya Kerja Kemenag */}
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                          <Award className="w-4 h-4 text-emerald-700" />
+                          <span>5 Nilai Budaya Kerja Kementerian Agama</span>
+                        </div>
+                        <span className="text-xs text-slate-500">Etika & Budaya Kinerja ASN</span>
+                      </div>
+
+                      <div className="space-y-4">
+                        {visiMisiForm.nilaiBudayaKerja.map((budaya, bIdx) => (
+                          <div key={bIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-emerald-800 uppercase tracking-wide">
+                                Nilai #{bIdx + 1}
+                              </span>
+                              <input
+                                type="text"
+                                value={budaya.nilai}
+                                onChange={(e) => handleUpdateBudayaKerja(bIdx, 'nilai', e.target.value)}
+                                className="font-bold text-slate-900 px-2 py-1 bg-white border border-slate-300 rounded text-xs"
+                              />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-slate-600 font-semibold mb-1">Makna Nilai</label>
+                                <textarea
+                                  rows={2}
+                                  value={budaya.makna}
+                                  onChange={(e) => handleUpdateBudayaKerja(bIdx, 'makna', e.target.value)}
+                                  className="w-full p-2 bg-white border border-slate-300 rounded text-xs"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-slate-600 font-semibold mb-1">Indikator Perilaku</label>
+                                <textarea
+                                  rows={2}
+                                  value={budaya.indikator}
+                                  onChange={(e) => handleUpdateBudayaKerja(bIdx, 'indikator', e.target.value)}
+                                  className="w-full p-2 bg-white border border-slate-300 rounded text-xs"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Submit Bar */}
+                    <div className="flex justify-end gap-3 pt-2">
+                      <button
+                        type="submit"
+                        className="flex items-center gap-2 px-6 py-2.5 font-bold text-white bg-emerald-800 hover:bg-emerald-900 rounded-xl shadow-md transition-all hover:scale-[1.02]"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>Simpan Perubahan Visi, Misi & Budaya Kerja</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* SUB-PANEL 2: STRUKTUR ORGANISASI */}
+                {activeProfilSubTab === 'struktur' && (
+                  <form onSubmit={handleSaveStruktur} className="space-y-6">
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                          <Network className="w-4 h-4 text-emerald-700" />
+                          <span>Pengaturan Struktur & Tata Kelola Kelembagaan</span>
+                        </div>
+                        <span className="text-xs text-slate-400">PMA / KMA Vertikal Kemenag</span>
+                      </div>
+
+                      <div className="space-y-4 text-xs">
+                        <div>
+                          <label className="block text-slate-700 font-semibold mb-1">
+                            Dasar Hukum / Regulasi Struktur
+                          </label>
+                          <input
+                            type="text"
+                            value={visiMisiForm.strukturDasarHukum || 'KMA No. 19 Tahun 2019'}
+                            onChange={(e) => setVisiMisiForm({ ...visiMisiForm, strukturDasarHukum: e.target.value })}
+                            placeholder="KMA No. 19 Tahun 2019"
+                            className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-700 font-semibold mb-1">
+                            Tugas Pokok & Kewenangan Pimpinan / Kantor
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={visiMisiForm.tugasPimpinan || 'Melaksanakan tugas pokok dan fungsi Kementerian Agama dalam lingkup Kabupaten Murung Raya berdasarkan kebijakan Menteri Agama dan peraturan perundang-undangan.'}
+                            onChange={(e) => setVisiMisiForm({ ...visiMisiForm, tugasPimpinan: e.target.value })}
+                            className="w-full p-3 border border-slate-300 rounded-xl text-xs leading-relaxed"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Preview Bagan Struktur */}
+                    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h4 className="text-sm font-bold text-slate-900">
+                          Pratinjau Hierarki Jabatan Kemenag Murung Raya
+                        </h4>
+                        <span className="text-xs text-emerald-700 font-semibold">Terkoneksi Otomatis ke Pejabat Eselon</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                        <div className="p-3.5 rounded-xl border border-emerald-300 bg-emerald-50/70 sm:col-span-2 lg:col-span-4 text-center">
+                          <span className="text-[10px] font-bold text-emerald-800 uppercase">Pimpinan Puncak</span>
+                          <div className="font-extrabold text-sm text-slate-900 mt-0.5">
+                            {activePejabatList.find(p => p.jabatan.toLowerCase().includes('kepala kantor'))?.nama || 'H. Marzuki Rahman'}, {activePejabatList.find(p => p.jabatan.toLowerCase().includes('kepala kantor'))?.gelar || 'S.Ag., M.Pd.I'}
+                          </div>
+                          <div className="text-[11px] text-slate-500">Kepala Kantor Kementerian Agama Kab. Murung Raya</div>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl border border-slate-200 bg-white">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase">Administrasi & TU</span>
+                          <div className="font-bold text-slate-900 mt-1">
+                            {activePejabatList.find(p => p.unitKerja.toLowerCase().includes('tata usaha') || p.jabatan.toLowerCase().includes('tata usaha'))?.nama || 'H. Ahmad Fauzi'}
+                          </div>
+                          <div className="text-[11px] text-slate-500">Kasubbag Tata Usaha</div>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl border border-slate-200 bg-white">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase">Pendidikan Islam</span>
+                          <div className="font-bold text-slate-900 mt-1">
+                            {activePejabatList.find(p => p.unitKerja.toLowerCase().includes('pendidikan') || p.unitKerja.toLowerCase().includes('pendis'))?.nama || 'Supriyanto'}
+                          </div>
+                          <div className="text-[11px] text-slate-500">Kasi Pendis (Madrasah & Pontren)</div>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl border border-slate-200 bg-white">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase">Bimas Islam & KUA</span>
+                          <div className="font-bold text-slate-900 mt-1">
+                            {activePejabatList.find(p => p.unitKerja.toLowerCase().includes('bimas islam'))?.nama || 'H. Muhammad Zaini'}
+                          </div>
+                          <div className="text-[11px] text-slate-500">Kasi Bimas Islam</div>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl border border-slate-200 bg-white">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase">Haji & Umrah</span>
+                          <div className="font-bold text-slate-900 mt-1">
+                            {activePejabatList.find(p => p.jabatan.toLowerCase().includes('haji') || p.unitKerja.toLowerCase().includes('haji'))?.nama || 'Hj. Siti Rohana'}
+                          </div>
+                          <div className="text-[11px] text-slate-500">Penyelenggara Haji & Umrah</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Submit Bar */}
+                    <div className="flex justify-end gap-3 pt-2">
+                      <button
+                        type="submit"
+                        className="flex items-center gap-2 px-6 py-2.5 font-bold text-white bg-emerald-800 hover:bg-emerald-900 rounded-xl shadow-md transition-all hover:scale-[1.02]"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>Simpan Struktur Organisasi</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* SUB-PANEL 3: DAFTAR PEJABAT ESELON (CRUD) */}
+                {activeProfilSubTab === 'pejabat' && (
+                  <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900">
+                          Daftar Pejabat Eselon & Subkoordinator
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Kelola jajaran pimpinan, Kepala Kantor, Kasubbag TU, Kepala Seksi, dan Penyelenggara Bimas.
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleOpenAddPejabat}
+                        className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-emerald-800 hover:bg-emerald-900 rounded-lg shadow-xs transition-colors"
+                      >
+                        <UserPlus className="w-3.5 h-3.5" />
+                        <span>Tambah Pejabat Eselon</span>
+                      </button>
+                    </div>
+
+                    {/* Search & Filter Bar */}
+                    <div className="flex flex-col sm:flex-row gap-3 text-xs">
+                      <div className="relative flex-1">
+                        <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                        <input
+                          type="text"
+                          value={searchPejabatAdmin}
+                          onChange={(e) => setSearchPejabatAdmin(e.target.value)}
+                          placeholder="Cari pejabat berdasarkan nama, NIP, jabatan, atau unit kerja..."
+                          className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-xs"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Filter className="w-3.5 h-3.5 text-slate-500" />
+                        <select
+                          value={filterEselonAdmin}
+                          onChange={(e) => setFilterEselonAdmin(e.target.value)}
+                          className="p-2 border border-slate-300 rounded-lg bg-white text-xs font-medium"
+                        >
+                          <option value="all">Semua Eselon</option>
+                          <option value="Eselon III/a">Eselon III/a (Kepala Kantor)</option>
+                          <option value="Eselon IV/a">Eselon IV/a (Kasubbag / Kasi)</option>
+                          <option value="Subkoordinator">Subkoordinator / Penyelenggara</option>
+                          <option value="Fungsional Tertentu">Fungsional Tertentu</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Grid of Officials */}
+                    {(() => {
+                      const filtered = activePejabatList.filter(pej => {
+                        const q = searchPejabatAdmin.toLowerCase();
+                        const matchQ = !q || 
+                          pej.nama.toLowerCase().includes(q) ||
+                          pej.jabatan.toLowerCase().includes(q) ||
+                          pej.nip.includes(q) ||
+                          pej.unitKerja.toLowerCase().includes(q);
+                        const matchE = filterEselonAdmin === 'all' || pej.eselon === filterEselonAdmin;
+                        return matchQ && matchE;
+                      });
+
+                      if (filtered.length === 0) {
+                        return (
+                          <div className="text-center py-12 text-slate-400 text-xs">
+                            Tidak ditemukan pejabat yang cocok dengan kriteria pencarian.
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {filtered.map((pej) => (
+                            <div 
+                              key={pej.id} 
+                              className="p-4 rounded-xl border border-slate-200 hover:border-emerald-300 transition-all bg-white shadow-2xs space-y-3"
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-900 font-black text-base flex items-center justify-center shrink-0 border border-emerald-200">
+                                    {pej.fotoUrl ? (
+                                      <img src={pej.fotoUrl} alt={pej.nama} className="w-full h-full object-cover rounded-xl" />
+                                    ) : (
+                                      pej.nama.charAt(0)
+                                    )}
+                                  </div>
+                                  <div>
+                                    <div className="font-bold text-slate-900 text-sm leading-tight">
+                                      {pej.nama}, {pej.gelar}
+                                    </div>
+                                    <div className="text-[11px] font-mono text-slate-500 mt-0.5">
+                                      NIP. {pej.nip}
+                                    </div>
+                                    <div className="text-xs font-semibold text-emerald-800 mt-0.5">
+                                      {pej.jabatan}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                                  pej.eselon === 'Eselon III/a' 
+                                    ? 'bg-amber-100 text-amber-900 border border-amber-300' 
+                                    : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                }`}>
+                                  {pej.eselon}
+                                </span>
+                              </div>
+
+                              <div className="pt-2 border-t border-slate-100 text-xs space-y-1 text-slate-600">
+                                <div><strong>Unit:</strong> {pej.unitKerja}</div>
+                                <div><strong>Pangkat/Gol:</strong> {pej.pangkatGolongan}</div>
+                                <div><strong>Pendidikan:</strong> {pej.pendidikan}</div>
+                                <div className="text-[11px] text-slate-500 truncate">
+                                  <strong>Email:</strong> {pej.kontakKedinasan}
+                                </div>
+                              </div>
+
+                              <div className="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditPejabat(pej)}
+                                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                  <span>Edit Data</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeletePejabat(pej)}
+                                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>Hapus</span>
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
             )}
 
@@ -2489,7 +3162,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <option value="Kegiatan Kemenag">Kegiatan Kemenag</option>
                     <option value="Pendidikan Islam">Pendidikan Islam</option>
                     <option value="Bimas Islam">Bimas Islam</option>
-                    <option value="Haji & Umrah">Haji & Umrah</option>
                     <option value="Kerukunan Umat">Kerukunan Umat</option>
                     <option value="Kepegawaian">Kepegawaian</option>
                   </select>
@@ -3303,6 +3975,181 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   className="px-5 py-2 font-semibold text-white bg-emerald-800 hover:bg-emerald-900 rounded-lg shadow-xs"
                 >
                   Simpan Data Pegawai
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: TAMBAH / EDIT PEJABAT ESELON */}
+      {isPejabatModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-xl w-full my-8 p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-emerald-800" />
+                <h3 className="text-base font-bold text-slate-900">
+                  {editingPejabat ? 'Edit Data Pejabat Eselon' : 'Tambah Pejabat Eselon Baru'}
+                </h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsPejabatModalOpen(false)} 
+                className="text-slate-400 hover:text-slate-600 p-1 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePejabat} className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Nama Lengkap (Tanpa Gelar) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={pejabatFormData.nama || ''}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, nama: e.target.value })}
+                    placeholder="Contoh: H. Marzuki Rahman"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Gelar Akademik</label>
+                  <input
+                    type="text"
+                    value={pejabatFormData.gelar || ''}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, gelar: e.target.value })}
+                    placeholder="Contoh: S.Ag., M.Pd.I"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">NIP Pejabat *</label>
+                  <input
+                    type="text"
+                    required
+                    value={pejabatFormData.nip || ''}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, nip: e.target.value })}
+                    placeholder="197205141999031003"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg font-mono text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Jabatan Kedinasan *</label>
+                  <input
+                    type="text"
+                    required
+                    value={pejabatFormData.jabatan || ''}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, jabatan: e.target.value })}
+                    placeholder="Contoh: Kepala Kantor Kemenag / Kasi Pendis"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Tingkat Eselon *</label>
+                  <select
+                    value={pejabatFormData.eselon || 'Eselon IV/a'}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, eselon: e.target.value as any })}
+                    className="w-full p-2.5 border border-slate-300 rounded-lg bg-white text-xs font-medium"
+                  >
+                    <option value="Eselon III/a">Eselon III/a (Kepala Kantor)</option>
+                    <option value="Eselon IV/a">Eselon IV/a (Kasubbag TU / Kepala Seksi)</option>
+                    <option value="Subkoordinator">Subkoordinator / Penyelenggara</option>
+                    <option value="Fungsional Tertentu">Fungsional Tertentu</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Pangkat & Golongan *</label>
+                  <input
+                    type="text"
+                    required
+                    value={pejabatFormData.pangkatGolongan || ''}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, pangkatGolongan: e.target.value })}
+                    placeholder="Contoh: Pembina Tingkat I (IV/b)"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Unit Kerja Kedinasan *</label>
+                  <input
+                    type="text"
+                    required
+                    value={pejabatFormData.unitKerja || ''}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, unitKerja: e.target.value })}
+                    placeholder="Contoh: Pimpinan Kantor / Seksi Pendis"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Pendidikan Terakhir</label>
+                  <input
+                    type="text"
+                    value={pejabatFormData.pendidikan || ''}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, pendidikan: e.target.value })}
+                    placeholder="Contoh: S2 Magister Pendidikan Islam"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Email / Kontak Kedinasan</label>
+                  <input
+                    type="text"
+                    value={pejabatFormData.kontakKedinasan || ''}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, kontakKedinasan: e.target.value })}
+                    placeholder="kemenag.mura@kemenag.go.id"
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">Foto URL (Opsional)</label>
+                  <input
+                    type="url"
+                    value={pejabatFormData.fotoUrl || ''}
+                    onChange={(e) => setPejabatFormData({ ...pejabatFormData, fotoUrl: e.target.value })}
+                    placeholder="https://..."
+                    className="w-full p-2.5 border border-slate-300 rounded-lg text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-semibold mb-1">Riwayat Singkat / Biografi Kedinasan</label>
+                <textarea
+                  rows={3}
+                  value={pejabatFormData.riwayatSingkat || ''}
+                  onChange={(e) => setPejabatFormData({ ...pejabatFormData, riwayatSingkat: e.target.value })}
+                  placeholder="Pengalaman karir dan dedikasi di lingkungan Kementerian Agama..."
+                  className="w-full p-2.5 border border-slate-300 rounded-lg text-xs leading-relaxed"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPejabatModalOpen(false)}
+                  className="px-4 py-2 font-medium text-slate-600 hover:text-slate-900"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 font-semibold text-white bg-emerald-800 hover:bg-emerald-900 rounded-lg shadow-xs"
+                >
+                  Simpan Data Pejabat
                 </button>
               </div>
             </form>

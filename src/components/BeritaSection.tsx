@@ -24,7 +24,6 @@ const CATEGORIES = [
   'Semua',
   'Pendidikan Islam',
   'Bimas Islam',
-  'Haji & Umrah',
   'Kerukunan Umat',
   'Kepegawaian',
   'Kegiatan Kemenag'
@@ -86,7 +85,7 @@ export const BeritaSection: React.FC<BeritaSectionProps> = ({
             Berita Terkini Kemenag Murung Raya
           </h1>
           <p className="text-sm text-slate-600 mt-1 max-w-2xl">
-            Liputan resmi seputar kegiatan keagamaan, prestasi madrasah, kebijakan haji, dan kerukunan umat beragama di Puruk Cahu dan sekitarnya.
+            Liputan resmi seputar kegiatan keagamaan, prestasi madrasah, dan kerukunan umat beragama di Puruk Cahu dan sekitarnya.
           </p>
         </div>
 

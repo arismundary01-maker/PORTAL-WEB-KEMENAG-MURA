@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ProfilSubTab, PejabatEselon } from '../types';
+import { ProfilSubTab, PejabatEselon, ProfilData } from '../types';
 import { PROFIL_DATA } from '../data/mockData';
 import { 
   Target, 
@@ -19,12 +19,14 @@ interface ProfilSectionProps {
   currentSubTab: ProfilSubTab;
   onSelectSubTab: (subTab: ProfilSubTab) => void;
   pejabatList: PejabatEselon[];
+  profilData?: ProfilData;
 }
 
 export const ProfilSection: React.FC<ProfilSectionProps> = ({
   currentSubTab,
   onSelectSubTab,
-  pejabatList
+  pejabatList,
+  profilData = PROFIL_DATA
 }) => {
   const [searchPejabat, setSearchPejabat] = useState('');
   const [selectedEselonFilter, setSelectedEselonFilter] = useState<string>('all');
@@ -108,17 +110,17 @@ export const ProfilSection: React.FC<ProfilSectionProps> = ({
               <span>Visi Kementerian Agama 2025 - 2029</span>
             </div>
             <p className="text-lg sm:text-2xl font-semibold leading-relaxed text-emerald-50">
-              "{PROFIL_DATA.visi}"
+              "{profilData.visi}"
             </p>
             <div className="mt-6 pt-4 border-t border-emerald-800/80 flex flex-wrap items-center gap-6 text-xs text-emerald-200">
               <div>
                 <span className="font-semibold text-white">Motto: </span>
-                <span className="text-amber-300 font-bold tracking-wide">IKHLAS BERAMAL</span>
+                <span className="text-amber-300 font-bold tracking-wide">{profilData.motto || 'IKHLAS BERAMAL'}</span>
               </div>
               <span>·</span>
               <div>
                 <span className="font-semibold text-white">Falsafah Daerah: </span>
-                <span>Tira Tangka Balang</span>
+                <span>{profilData.semboyanDaerah || 'Tira Tangka Balang'}</span>
               </div>
             </div>
           </div>
@@ -133,7 +135,7 @@ export const ProfilSection: React.FC<ProfilSectionProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {PROFIL_DATA.misi.map((misiText, index) => (
+              {profilData.misi.map((misiText, index) => (
                 <div 
                   key={index}
                   className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-start gap-4"
@@ -162,7 +164,7 @@ export const ProfilSection: React.FC<ProfilSectionProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {PROFIL_DATA.nilaiBudayaKerja.map((item, idx) => (
+              {profilData.nilaiBudayaKerja.map((item, idx) => (
                 <div 
                   key={idx}
                   className="bg-white p-5 rounded-xl border border-slate-200 hover:border-emerald-300 transition-colors shadow-xs space-y-2.5"

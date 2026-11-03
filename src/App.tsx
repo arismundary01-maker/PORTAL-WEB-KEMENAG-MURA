@@ -16,7 +16,9 @@ import {
   KuaKecamatan, 
   TempatIbadahKristen, 
   TempatIbadahHindu,
-  TempatIbadahBudha 
+  TempatIbadahBudha,
+  PejabatEselon,
+  ProfilData
 } from './types';
 
 import { 
@@ -26,6 +28,7 @@ import {
 } from './types/admin';
 
 import { 
+  PROFIL_DATA,
   INITIAL_PEJABAT, 
   INITIAL_PEGAWAI, 
   INITIAL_LEMBAGA_PENDIS, 
@@ -97,7 +100,8 @@ export default function App() {
   // News, circular, and gallery lists with setters for Admin manipulation
   const [beritaList, setBeritaList] = useState<Berita[]>(INITIAL_BERITA);
   const [pengumumanList, setPengumumanList] = useState<Pengumuman[]>(INITIAL_PENGUMUMAN);
-  const [pejabatList] = useState(INITIAL_PEJABAT);
+  const [pejabatList, setPejabatList] = useState<PejabatEselon[]>(INITIAL_PEJABAT);
+  const [profilData, setProfilData] = useState<ProfilData>(PROFIL_DATA);
   const [galeriList, setGaleriList] = useState(INITIAL_GALERI);
 
   const handleSelectTab = (tab: NavigationTab) => {
@@ -225,6 +229,10 @@ export default function App() {
           setAuditLogs={setAuditLogs}
           ptspRequests={ptspRequests}
           setPtspRequests={setPtspRequests}
+          profilData={profilData}
+          setProfilData={setProfilData}
+          pejabatList={pejabatList}
+          setPejabatList={setPejabatList}
         />
         <AdminLoginModal
           isOpen={isAdminLoginModalOpen}
@@ -307,6 +315,7 @@ export default function App() {
             currentSubTab={currentProfilSubTab}
             onSelectSubTab={setCurrentProfilSubTab}
             pejabatList={pejabatList}
+            profilData={profilData}
           />
         )}
 

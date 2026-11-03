@@ -1008,7 +1008,7 @@ export const INITIAL_BERITA: Berita[] = [
     judul: "Kemenag Murung Raya Gelar Pembinaan Manasik Haji Sepanjang Tahun di Aula KUA Kecamatan Murung",
     ringkasan: "Sebanyak 74 calon jemaah haji estimasi keberangkatan 1448 H / 2027 M mengikuti pembinaan intensif bimbingan ibadah dan kesiapan fisik.",
     konten: "Puruk Cahu — Kantor Kementerian Agama Kabupaten Murung Raya melalui Seksi Penyelenggaraan Haji dan Umrah (PHU) menggelar pembinaan 'Manasik Haji Sepanjang Tahun' bertempat di Aula KUA Kecamatan Murung.\n\nKasi PHU Hj. Siti Rohana menjelaskan bahwa program manasik sepanjang tahun ini bertujuan untuk membekali jemaah sejak dini, baik dari sisi fiqih manasik haji, istitha'ah kesehatan, hingga pemahaman rukun dan wajib haji saat berada di Tanah Suci Makkah dan Madinah.\n\n'Calon jemaah kita mayoritas berasal dari berbagai pelosok kecamatan di Murung Raya. Pendampingan berkelanjutan ini memastikan seluruh jemaah memahami alur perjalanan ibadah dengan nyaman dan khusyuk,' jelasnya.",
-    kategori: "Haji & Umrah",
+    kategori: "Kegiatan Kemenag",
     penulis: "Seksi Haji dan Umrah",
     jabatanPenulis: "Penyelenggara PHU",
     tanggalUnggah: "2026-10-18",

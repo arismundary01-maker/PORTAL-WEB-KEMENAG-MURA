@@ -121,7 +121,7 @@ export interface Berita {
   judul: string;
   ringkasan: string;
   konten: string;
-  kategori: 'Pendidikan Islam' | 'Bimas Islam' | 'Haji & Umrah' | 'Kerukunan Umat' | 'Kepegawaian' | 'Kegiatan Kemenag';
+  kategori: 'Pendidikan Islam' | 'Bimas Islam' | 'Kerukunan Umat' | 'Kepegawaian' | 'Kegiatan Kemenag';
   penulis: string;
   jabatanPenulis: string;
   tanggalUnggah: string;
@@ -173,4 +173,36 @@ export interface GaleriKegiatan {
   jumlahFoto: number;
   gambarUrl?: string;
   tags: string[];
+}
+
+export interface NilaiBudayaKerja {
+  nilai: string;
+  makna: string;
+  indikator: string;
+}
+
+export interface StrukturUnit {
+  id: string;
+  posisi: string;
+  pejabat: string;
+  nip: string;
+  keterangan: string;
+  level: 'pimpinan' | 'tata-usaha' | 'seksi' | 'penyelenggara' | 'fungsional';
+}
+
+export interface ProfilData {
+  namaKantor: string;
+  wilayah: string;
+  ibuKota: string;
+  alamat: string;
+  telepon: string;
+  email: string;
+  website: string;
+  motto: string;
+  semboyanDaerah: string;
+  visi: string;
+  misi: string[];
+  nilaiBudayaKerja: NilaiBudayaKerja[];
+  strukturDasarHukum?: string;
+  tugasPimpinan?: string;
 }

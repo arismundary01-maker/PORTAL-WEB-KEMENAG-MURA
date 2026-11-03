@@ -173,11 +173,11 @@ export const OfficialEmblem: React.FC<OfficialEmblemProps> = ({
         </linearGradient>
       </defs>
 
-      {/* Outer Golden Border Pentagonal Shield */}
+      {/* Outer Green Border Pentagonal Shield */}
       <polygon
         points="50,4 92,24 84,78 50,96 16,78 8,24"
         fill="url(#kemenagGreen)"
-        stroke="url(#kemenagGold)"
+        stroke="#047857"
         strokeWidth="3.5"
         strokeLinejoin="round"
       />

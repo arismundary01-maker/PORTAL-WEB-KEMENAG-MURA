@@ -227,8 +227,8 @@ export const Header: React.FC<HeaderProps> = ({
               className="flex items-center gap-3.5 text-left focus:outline-hidden group shrink-0"
               title="Kembali ke Beranda Portal Kemenag Murung Raya"
             >
-              {/* Emblem with crisp gold-trimmed container */}
-              <div className="relative p-1 rounded-2xl bg-white shadow-md border-2 border-amber-400/50 group-hover:border-amber-300 transition-all group-hover:shadow-lg">
+              {/* Emblem with crisp green Kemenag border */}
+              <div className="relative p-1 rounded-2xl bg-white shadow-md border-2 border-emerald-600 group-hover:border-emerald-500 ring-2 ring-emerald-600/30 transition-all group-hover:shadow-lg">
                 <OfficialEmblem 
                   size={54} 
                   logoType={portalConfig?.logoType || 'kemenag-ri'}
@@ -355,7 +355,7 @@ export const Header: React.FC<HeaderProps> = ({
                   }`}
                 >
                   <Layers className={`w-3.5 h-3.5 ${themeStyle.navIcon}`} />
-                  <span>Layanan Per Seksi</span>
+                  <span>Data Per Bidang</span>
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${seksiDropdownOpen ? 'rotate-180 text-amber-500' : themeStyle.chevronColor}`} />
                   {currentTab === 'data-informasi' && (
                     <span className={`absolute bottom-0 left-2 right-2 h-0.5 ${themeStyle.activeIndicator} rounded-full`} />
@@ -428,20 +428,6 @@ export const Header: React.FC<HeaderProps> = ({
                         <div>
                           <div className="font-bold text-slate-900">Bimas Hindu</div>
                           <div className="text-[10px] text-slate-500">Balai Basarah & Umat Kaharingan</div>
-                        </div>
-                      </button>
-
-                      {/* Bimas Budha */}
-                      <button
-                        onClick={() => handleSeksiClick('bimas-budha')}
-                        className="w-full text-left p-2.5 rounded-xl text-xs text-slate-700 hover:bg-cyan-50/90 hover:text-cyan-900 transition-colors flex items-center gap-3 border border-transparent hover:border-cyan-200"
-                      >
-                        <span className="w-7 h-7 rounded-lg bg-cyan-500 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-xs">
-                          ☸
-                        </span>
-                        <div>
-                          <div className="font-bold text-slate-900">Bimas Budha</div>
-                          <div className="text-[10px] text-slate-500">Vihara, Cetiya & Umat Budha</div>
                         </div>
                       </button>
 
@@ -553,21 +539,6 @@ export const Header: React.FC<HeaderProps> = ({
                 )}
               </button>
 
-              {/* Tab: Data & Informasi */}
-              <button
-                onClick={() => handleTabClick('data-informasi')}
-                className={`px-3 py-1.5 rounded-lg transition-all relative ${
-                  currentTab === 'data-informasi' 
-                    ? themeStyle.navActive 
-                    : themeStyle.navText
-                }`}
-              >
-                Data & Informasi
-                {currentTab === 'data-informasi' && (
-                  <span className={`absolute bottom-0 left-2 right-2 h-0.5 ${themeStyle.activeIndicator} rounded-full`} />
-                )}
-              </button>
-
               {/* Tab: Galeri Kegiatan */}
               <button
                 onClick={() => handleTabClick('galeri')}
@@ -620,11 +591,11 @@ export const Header: React.FC<HeaderProps> = ({
               Beranda
             </button>
 
-            {/* Mobile Layanan Per Seksi Group */}
+            {/* Mobile Data Per Bidang Group */}
             <div className={`py-2 ${themeStyle.drawerGroupBg} rounded-2xl p-2.5 my-1`}>
               <div className={`px-2 pb-1.5 text-[11px] font-black uppercase tracking-wider ${themeStyle.drawerGroupTitle} flex items-center justify-between`}>
-                <span>Layanan Per Seksi (Kemenag Mura)</span>
-                <span className={`text-[10px] ${themeStyle.drawerGroupBadge} px-1.5 py-0.2 rounded font-black`}>6 Bidang</span>
+                <span>Data Per Bidang (Kemenag Mura)</span>
+                <span className={`text-[10px] ${themeStyle.drawerGroupBadge} px-1.5 py-0.2 rounded font-black`}>5 Bidang</span>
               </div>
               <div className="space-y-1 mt-1">
                 <button
@@ -657,13 +628,6 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                   Bimas Hindu
-                </button>
-                <button
-                  onClick={() => handleSeksiClick('bimas-budha')}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 hover:bg-cyan-100/90 flex items-center gap-2 bg-white shadow-2xs"
-                >
-                  <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
-                  Bimas Budha
                 </button>
                 <button
                   onClick={() => handleSeksiClick('kepegawaian')}
@@ -718,15 +682,6 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               Pengumuman Resmi
-            </button>
-
-            <button
-              onClick={() => handleTabClick('data-informasi')}
-              className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'data-informasi' ? themeStyle.drawerActive : themeStyle.drawerInactive
-              }`}
-            >
-              Data dan Informasi (Perbidang)
             </button>
 
             <button
