@@ -2074,7 +2074,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
-                        {/* Emerald Classic */}
+                        {/* Hijau Muda Transparan */}
                         <div
                           onClick={() => setBrandingForm({ ...brandingForm, headerTheme: 'emerald' })}
                           className={`p-3 rounded-xl border cursor-pointer transition-all ${
@@ -2083,11 +2083,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               : 'border-slate-200 hover:bg-slate-50'
                           }`}
                         >
-                          <div className="w-full h-7 rounded-lg bg-emerald-900 flex items-center justify-center text-white text-[10px] font-bold mb-2">
-                            #044326
+                          <div className="w-full h-7 rounded-lg bg-emerald-100/90 border border-emerald-400/60 flex items-center justify-center text-emerald-950 text-[10px] font-bold mb-2 shadow-2xs">
+                            Transparan
                           </div>
-                          <div className="font-bold text-slate-900 text-xs text-center">Hijau Klasik</div>
-                          <div className="text-[10px] text-slate-500 text-center">Resmi Kemenag</div>
+                          <div className="font-bold text-slate-900 text-xs text-center">Hijau Muda Transparan</div>
+                          <div className="text-[10px] text-slate-500 text-center">Modern & Transparan</div>
                         </div>
 
                         {/* Navy Blue */}

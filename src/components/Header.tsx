@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   const theme = portalConfig?.headerTheme || 'emerald';
   const customColor = portalConfig?.customHeaderColor || '#004d34';
 
-  // Dynamic Theme Styling with Kementerian Agama Iconic Palettes (Deep Emerald Green & Radiant Gold)
+  // Dynamic Theme Styling with Translucent Light Green (Hijau Muda Transparan) & Iconic Kemenag Accents
   const getThemeStyles = () => {
     switch (theme) {
       case 'navy':
@@ -49,13 +49,25 @@ export const Header: React.FC<HeaderProps> = ({
           titleColor: 'text-amber-300',
           subTitleColor: 'text-white',
           taglineBadge: 'bg-white/10 text-sky-200 border-sky-400/40',
+          subTaglineColor: 'text-emerald-200/90 font-medium',
+          trustBadge: 'bg-emerald-950/70 border border-amber-400/40 text-amber-200',
+          trustBadgeTitle: 'text-white',
+          trustBadgeSub: 'text-amber-300',
+          trustIcon: 'text-amber-400',
           navBg: 'bg-[#040e1a] border-t border-sky-900/60 shadow-md',
           navText: 'text-slate-200 hover:text-amber-300 hover:bg-white/5',
           navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
           activeIndicator: 'bg-amber-400',
+          navIcon: 'text-amber-400',
+          chevronColor: 'text-sky-300/70',
           ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
+          mobileBtnBg: 'bg-amber-400 text-slate-950 border border-amber-300 hover:bg-amber-300',
           drawerBg: 'bg-[#040e1a] text-white',
-          drawerActive: 'bg-sky-600 text-white'
+          drawerActive: 'bg-sky-600 text-white',
+          drawerInactive: 'text-emerald-100 hover:bg-white/10',
+          drawerGroupBg: 'bg-slate-900/80 border border-sky-800/60',
+          drawerGroupTitle: 'text-amber-300',
+          drawerGroupBadge: 'bg-amber-400 text-slate-950'
         };
       case 'forest':
         return {
@@ -64,13 +76,25 @@ export const Header: React.FC<HeaderProps> = ({
           titleColor: 'text-amber-300',
           subTitleColor: 'text-white',
           taglineBadge: 'bg-emerald-950/80 text-amber-200 border-amber-400/40',
+          subTaglineColor: 'text-emerald-200/90 font-medium',
+          trustBadge: 'bg-emerald-950/70 border border-amber-400/40 text-amber-200',
+          trustBadgeTitle: 'text-white',
+          trustBadgeSub: 'text-amber-300',
+          trustIcon: 'text-amber-400',
           navBg: 'bg-[#01140e] border-t border-emerald-900/60 shadow-md',
           navText: 'text-emerald-100/90 hover:text-amber-300 hover:bg-white/5',
           navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
           activeIndicator: 'bg-amber-400',
+          navIcon: 'text-amber-400',
+          chevronColor: 'text-emerald-300/70',
           ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
+          mobileBtnBg: 'bg-amber-400 text-slate-950 border border-amber-300 hover:bg-amber-300',
           drawerBg: 'bg-[#01140e] text-white',
-          drawerActive: 'bg-emerald-600 text-white'
+          drawerActive: 'bg-emerald-600 text-white',
+          drawerInactive: 'text-emerald-100 hover:bg-white/10',
+          drawerGroupBg: 'bg-emerald-950/70 border border-emerald-800/60',
+          drawerGroupTitle: 'text-amber-300',
+          drawerGroupBadge: 'bg-amber-400 text-slate-950'
         };
       case 'maroon':
         return {
@@ -79,45 +103,82 @@ export const Header: React.FC<HeaderProps> = ({
           titleColor: 'text-amber-300',
           subTitleColor: 'text-white',
           taglineBadge: 'bg-white/10 text-rose-200 border-amber-400/40',
+          subTaglineColor: 'text-rose-200/90 font-medium',
+          trustBadge: 'bg-rose-950/70 border border-amber-400/40 text-amber-200',
+          trustBadgeTitle: 'text-white',
+          trustBadgeSub: 'text-amber-300',
+          trustIcon: 'text-amber-400',
           navBg: 'bg-[#1a0307] border-t border-rose-900/60 shadow-md',
           navText: 'text-rose-100/90 hover:text-amber-300 hover:bg-white/5',
           navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
           activeIndicator: 'bg-amber-400',
+          navIcon: 'text-amber-400',
+          chevronColor: 'text-rose-300/70',
           ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
+          mobileBtnBg: 'bg-amber-400 text-slate-950 border border-amber-300 hover:bg-amber-300',
           drawerBg: 'bg-[#1a0307] text-white',
-          drawerActive: 'bg-rose-700 text-white'
+          drawerActive: 'bg-rose-700 text-white',
+          drawerInactive: 'text-rose-100 hover:bg-white/10',
+          drawerGroupBg: 'bg-rose-950/70 border border-rose-800/60',
+          drawerGroupTitle: 'text-amber-300',
+          drawerGroupBadge: 'bg-amber-400 text-slate-950'
         };
       case 'custom':
         return {
-          brandingBg: 'border-b-2 border-amber-400/40 text-white',
+          brandingBg: 'border-b border-emerald-400/40 text-white backdrop-blur-md',
           brandingStyle: { backgroundColor: customColor },
-          brandingBorder: 'border-b-2 border-amber-400/40',
+          brandingBorder: 'border-b border-emerald-400/40',
           titleColor: 'text-amber-300',
           subTitleColor: 'text-white',
           taglineBadge: 'bg-white/10 text-white border-white/30',
-          navBg: 'bg-slate-950 border-t border-white/20 shadow-md',
+          subTaglineColor: 'text-slate-200 font-medium',
+          trustBadge: 'bg-slate-950/60 border border-white/20 text-white',
+          trustBadgeTitle: 'text-white',
+          trustBadgeSub: 'text-amber-300',
+          trustIcon: 'text-amber-400',
+          navBg: 'bg-slate-950/90 backdrop-blur-md border-t border-white/20 shadow-md',
           navText: 'text-slate-200 hover:text-amber-300 hover:bg-white/5',
           navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
           activeIndicator: 'bg-amber-400',
+          navIcon: 'text-amber-400',
+          chevronColor: 'text-slate-300/70',
           ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
+          mobileBtnBg: 'bg-amber-400 text-slate-950 border border-amber-300 hover:bg-amber-300',
           drawerBg: 'bg-slate-950 text-white',
-          drawerActive: 'bg-emerald-600 text-white'
+          drawerActive: 'bg-emerald-600 text-white',
+          drawerInactive: 'text-slate-200 hover:bg-white/10',
+          drawerGroupBg: 'bg-slate-900 border border-slate-800',
+          drawerGroupTitle: 'text-amber-300',
+          drawerGroupBadge: 'bg-amber-400 text-slate-950'
         };
       case 'emerald':
       default:
+        // Hijau Muda Transparan (Translucent Light Green with Glassmorphism)
         return {
-          brandingBg: 'bg-linear-to-r from-[#012f20] via-[#004d34] to-[#013524]',
-          brandingBorder: 'border-b-2 border-amber-400/40',
-          titleColor: 'text-amber-300',
-          subTitleColor: 'text-white',
-          taglineBadge: 'bg-emerald-950/80 text-amber-200 border-amber-400/40',
-          navBg: 'bg-[#012519] border-t border-emerald-900/70 shadow-md',
-          navText: 'text-emerald-100/90 hover:text-amber-300 hover:bg-white/5',
-          navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
-          activeIndicator: 'bg-amber-400',
+          brandingBg: 'bg-linear-to-r from-emerald-100/75 via-emerald-50/70 to-teal-50/75 backdrop-blur-md',
+          brandingBorder: 'border-b border-emerald-300/40 shadow-xs',
+          titleColor: 'text-emerald-950 font-black',
+          subTitleColor: 'text-emerald-900 font-extrabold',
+          taglineBadge: 'bg-emerald-600/15 text-emerald-900 border-emerald-400/50 font-bold',
+          subTaglineColor: 'text-emerald-800/80 font-semibold',
+          trustBadge: 'bg-white/80 border border-emerald-300/60 text-slate-800 shadow-xs backdrop-blur-md',
+          trustBadgeTitle: 'text-emerald-950 font-black',
+          trustBadgeSub: 'text-emerald-700 font-bold',
+          trustIcon: 'text-emerald-700',
+          navBg: 'bg-emerald-50/75 backdrop-blur-md border-t border-emerald-200/60 shadow-xs',
+          navText: 'text-emerald-950/85 hover:text-emerald-900 hover:bg-emerald-200/50 font-bold',
+          navActive: 'text-emerald-950 font-black bg-emerald-200/80 shadow-xs ring-1 ring-emerald-400/40',
+          activeIndicator: 'bg-emerald-700',
+          navIcon: 'text-emerald-800',
+          chevronColor: 'text-emerald-700/80',
           ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
-          drawerBg: 'bg-[#012519] text-white',
-          drawerActive: 'bg-amber-400 text-slate-950 font-black'
+          mobileBtnBg: 'bg-emerald-700 text-white border border-emerald-600 hover:bg-emerald-800',
+          drawerBg: 'bg-emerald-50/95 backdrop-blur-xl border-t border-emerald-300/60 text-slate-900',
+          drawerActive: 'bg-emerald-700 text-white font-bold',
+          drawerInactive: 'text-emerald-950 hover:bg-emerald-200/60 font-semibold',
+          drawerGroupBg: 'bg-white/80 border border-emerald-300/50 shadow-xs',
+          drawerGroupTitle: 'text-emerald-900 font-black',
+          drawerGroupBadge: 'bg-emerald-700 text-white'
         };
     }
   };
@@ -146,9 +207,9 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 shadow-lg transition-all">
+    <header className="sticky top-0 z-50 transition-all backdrop-blur-md shadow-xs">
       
-      {/* MAIN BRANDING BAR: Characteristic Kementerian Agama Deep Green & Gold Theme */}
+      {/* MAIN BRANDING BAR: Translucent Light Green or Selected Theme */}
       <div 
         className={`${themeStyle.brandingBg} ${themeStyle.brandingBorder} relative overflow-hidden`}
         style={themeStyle.brandingStyle}
@@ -160,7 +221,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex items-center justify-between gap-4 py-3 sm:py-3.5">
             
-            {/* Left Brand Lockup: Emblem + Kemenag Gold & White Typography */}
+            {/* Left Brand Lockup: Emblem + Kemenag Gold & Typography */}
             <button
               onClick={() => handleTabClick('beranda')}
               className="flex items-center gap-3.5 text-left focus:outline-hidden group shrink-0"
@@ -178,7 +239,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               {/* Institutional Text Lockup */}
               <div className="flex flex-col">
-                <span className={`text-sm sm:text-base font-black tracking-wider uppercase leading-tight font-sans ${themeStyle.titleColor} drop-shadow-sm`}>
+                <span className={`text-sm sm:text-base font-black tracking-wider uppercase leading-tight font-sans ${themeStyle.titleColor} drop-shadow-xs`}>
                   {portalConfig?.namaInstansi || 'KEMENTERIAN AGAMA'}
                 </span>
                 <span className={`text-xs sm:text-[13px] font-black ${themeStyle.subTitleColor} tracking-wider uppercase leading-tight mt-0.5 drop-shadow-2xs`}>
@@ -188,7 +249,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className={`text-[10px] font-bold ${themeStyle.taglineBadge} px-2.5 py-0.5 rounded-md border shadow-2xs`}>
                     {portalConfig?.tagline || 'Ikhlas Beramal'}
                   </span>
-                  <span className="text-[10px] text-emerald-200/90 hidden sm:inline font-medium">
+                  <span className={`text-[10px] ${themeStyle.subTaglineColor} hidden sm:inline`}>
                     · Tira Tangka Balang
                   </span>
                 </div>
@@ -196,18 +257,18 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* Center Trust Accent (Desktop): Zona Integritas Seal */}
-            <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-950/70 border border-amber-400/40 text-amber-200 text-xs shadow-inner backdrop-blur-md">
-              <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+            <div className={`hidden xl:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full ${themeStyle.trustBadge} text-xs shadow-xs backdrop-blur-md`}>
+              <ShieldCheck className={`w-4 h-4 ${themeStyle.trustIcon} shrink-0`} />
               <div className="flex flex-col text-left">
-                <span className="font-extrabold text-[11px] leading-none text-white">Zona Integritas</span>
-                <span className="text-[9px] text-amber-300 font-medium leading-tight">WBK & WBBM Terpercaya</span>
+                <span className={`font-extrabold text-[11px] leading-none ${themeStyle.trustBadgeTitle}`}>Zona Integritas</span>
+                <span className={`text-[9px] ${themeStyle.trustBadgeSub} font-medium leading-tight`}>WBK & WBBM Terpercaya</span>
               </div>
             </div>
 
             {/* Right Brand: Kemenag Droplet + BerAKHLAK Official Identity */}
             <div className="flex items-center gap-3 shrink-0">
               
-              <div className="flex items-center gap-3 bg-white border border-amber-300/40 shadow-md rounded-2xl px-3 py-1.5">
+              <div className="flex items-center gap-3 bg-white/95 border border-emerald-300/40 shadow-xs rounded-2xl px-3 py-1.5 backdrop-blur-xs">
                 {/* Official Kemenag Droplet Teardrop Badge */}
                 <div className="flex items-center gap-1.5" title="Kementerian Agama RI">
                   <svg viewBox="0 0 48 58" className="w-7 h-9 drop-shadow-xs" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -247,7 +308,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center lg:hidden ml-1">
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2.5 rounded-xl bg-amber-400 text-slate-950 border border-amber-300 hover:bg-amber-300 transition-colors shadow-md"
+                  className={`p-2.5 rounded-xl ${themeStyle.mobileBtnBg} transition-colors shadow-xs`}
                   aria-label="Buka navigasi menu"
                 >
                   {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -258,7 +319,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* 3. NAVIGATION BAR (DESKTOP): Characteristic Kemenag Green Ribbon */}
+      {/* 3. NAVIGATION BAR (DESKTOP): Characteristic Translucent Green Ribbon */}
       <div className={`hidden lg:block ${themeStyle.navBg}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-6 py-2">
@@ -293,9 +354,9 @@ export const Header: React.FC<HeaderProps> = ({
                       : themeStyle.navText
                   }`}
                 >
-                  <Layers className="w-3.5 h-3.5 text-amber-400" />
+                  <Layers className={`w-3.5 h-3.5 ${themeStyle.navIcon}`} />
                   <span>Layanan Per Seksi</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${seksiDropdownOpen ? 'rotate-180 text-amber-300' : 'text-emerald-300/70'}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${seksiDropdownOpen ? 'rotate-180 text-amber-500' : themeStyle.chevronColor}`} />
                   {currentTab === 'data-informasi' && (
                     <span className={`absolute bottom-0 left-2 right-2 h-0.5 ${themeStyle.activeIndicator} rounded-full`} />
                   )}
@@ -417,7 +478,7 @@ export const Header: React.FC<HeaderProps> = ({
                   }`}
                 >
                   <span>Profil Kemenag</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${profilDropdownOpen ? 'rotate-180 text-amber-300' : 'text-emerald-300/70'}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${profilDropdownOpen ? 'rotate-180 text-amber-500' : themeStyle.chevronColor}`} />
                   {currentTab === 'profil' && (
                     <span className={`absolute bottom-0 left-2 right-2 h-0.5 ${themeStyle.activeIndicator} rounded-full`} />
                   )}
@@ -545,25 +606,25 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* MOBILE DRAWER MENU: Characteristic Kemenag Green Drawer */}
+      {/* MOBILE DRAWER MENU: Dynamic Theme Drawer */}
       {mobileMenuOpen && (
-        <div className={`lg:hidden ${themeStyle.drawerBg} border-t border-emerald-800/80 px-4 pt-3 pb-8 shadow-2xl animate-fadeIn`}>
+        <div className={`lg:hidden ${themeStyle.drawerBg} px-4 pt-3 pb-8 shadow-2xl animate-fadeIn`}>
           
           <div className="flex flex-col space-y-1">
             <button
               onClick={() => handleTabClick('beranda')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'beranda' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
+                currentTab === 'beranda' ? themeStyle.drawerActive : themeStyle.drawerInactive
               }`}
             >
               Beranda
             </button>
 
             {/* Mobile Layanan Per Seksi Group */}
-            <div className="py-2 bg-emerald-950/70 rounded-2xl p-2.5 my-1 border border-emerald-800/60">
-              <div className="px-2 pb-1.5 text-[11px] font-black uppercase tracking-wider text-amber-300 flex items-center justify-between">
+            <div className={`py-2 ${themeStyle.drawerGroupBg} rounded-2xl p-2.5 my-1`}>
+              <div className={`px-2 pb-1.5 text-[11px] font-black uppercase tracking-wider ${themeStyle.drawerGroupTitle} flex items-center justify-between`}>
                 <span>Layanan Per Seksi (Kemenag Mura)</span>
-                <span className="text-[10px] bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded font-black">6 Bidang</span>
+                <span className={`text-[10px] ${themeStyle.drawerGroupBadge} px-1.5 py-0.2 rounded font-black`}>6 Bidang</span>
               </div>
               <div className="space-y-1 mt-1">
                 <button
@@ -615,26 +676,26 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* Mobile Profil Group */}
-            <div className="py-2 bg-emerald-950/70 rounded-2xl p-2.5 my-1 border border-emerald-800/60">
-              <div className="px-2 pb-1.5 text-[11px] font-black uppercase tracking-wider text-amber-300">
+            <div className={`py-2 ${themeStyle.drawerGroupBg} rounded-2xl p-2.5 my-1`}>
+              <div className={`px-2 pb-1.5 text-[11px] font-black uppercase tracking-wider ${themeStyle.drawerGroupTitle}`}>
                 Profil Kantor Kementerian Agama
               </div>
               <div className="space-y-1">
                 <button
                   onClick={() => handleProfilSubClick('visi-misi')}
-                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md text-emerald-100 hover:bg-white/10"
+                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md hover:bg-black/5"
                 >
                   · Visi, Misi & Budaya Kerja
                 </button>
                 <button
                   onClick={() => handleProfilSubClick('struktur')}
-                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md text-emerald-100 hover:bg-white/10"
+                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md hover:bg-black/5"
                 >
                   · Struktur Organisasi & Tugas
                 </button>
                 <button
                   onClick={() => handleProfilSubClick('pejabat')}
-                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md text-emerald-100 hover:bg-white/10"
+                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md hover:bg-black/5"
                 >
                   · Daftar Pejabat Eselon
                 </button>
@@ -644,7 +705,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => handleTabClick('berita')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'berita' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
+                currentTab === 'berita' ? themeStyle.drawerActive : themeStyle.drawerInactive
               }`}
             >
               Berita Terkini
@@ -653,7 +714,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => handleTabClick('pengumuman')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'pengumuman' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
+                currentTab === 'pengumuman' ? themeStyle.drawerActive : themeStyle.drawerInactive
               }`}
             >
               Pengumuman Resmi
@@ -662,7 +723,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => handleTabClick('data-informasi')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'data-informasi' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
+                currentTab === 'data-informasi' ? themeStyle.drawerActive : themeStyle.drawerInactive
               }`}
             >
               Data dan Informasi (Perbidang)
@@ -671,7 +732,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => handleTabClick('galeri')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'galeri' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
+                currentTab === 'galeri' ? themeStyle.drawerActive : themeStyle.drawerInactive
               }`}
             >
               Galeri Kegiatan
