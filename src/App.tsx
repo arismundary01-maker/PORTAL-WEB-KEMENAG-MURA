@@ -345,6 +345,8 @@ export default function App() {
             tempatIbadahBudhaData={tempatIbadahBudhaData}
             setTempatIbadahBudhaData={setTempatIbadahBudhaData}
             initialSectorTab={selectedSector}
+            isAdminLoggedIn={isAdminLoggedIn}
+            currentAdminUser={currentAdminUser}
           />
         )}
 

@@ -96,25 +96,34 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                 {/* 1. Pendidikan Islam (Direct Integration to sipendismura.my.id) */}
                 <button
                   onClick={() => handleSectorClick('pendidikan-islam')}
-                  className="group relative bg-white/95 hover:bg-white rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl border border-emerald-200 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-emerald-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-emerald-400"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-emerald-600 to-emerald-800 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                  {/* Thematic Background Photo: Madrasah / Islamic Education */}
+                  <img 
+                    src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80" 
+                    alt="Pendidikan Islam Background" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                  />
+                  {/* Rich Gradient Overlay for WCAG AA Readability */}
+                  <div className="absolute inset-0 bg-linear-to-r from-emerald-950/95 via-emerald-950/85 to-slate-950/70 group-hover:from-emerald-950/90 group-hover:via-emerald-900/80 group-hover:to-slate-900/60 transition-colors" />
+
+                  <div className="relative z-10 flex items-center gap-3.5">
+                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 ring-2 ring-emerald-400/40">
                       <GraduationCap className="w-7 h-7" />
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-800 leading-tight">
+                        <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
                           Pendidikan Islam
                         </h3>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 uppercase">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">
                           Online
                         </span>
                       </div>
-                      <p className="text-xs text-emerald-700 font-semibold mt-0.5">SI PENDIS (sipendismura.my.id)</p>
+                      <p className="text-xs text-emerald-200 font-semibold mt-0.5 drop-shadow-xs">SI PENDIS (sipendismura.my.id)</p>
                     </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-emerald-700 transition-colors shrink-0">
+                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
                     <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
@@ -122,20 +131,29 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                 {/* 2. Bimas Islam */}
                 <button
                   onClick={() => handleSectorClick('bimas-islam')}
-                  className="group relative bg-white/95 hover:bg-white rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl border border-slate-200/90 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-blue-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-blue-400"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-blue-600 to-blue-800 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                  {/* Thematic Background Photo: Grand Mosque & Islamic Architecture */}
+                  <img 
+                    src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" 
+                    alt="Bimas Islam Background" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                  />
+                  {/* Rich Gradient Overlay for WCAG AA Readability */}
+                  <div className="absolute inset-0 bg-linear-to-r from-blue-950/95 via-blue-950/85 to-slate-950/70 group-hover:from-blue-950/90 group-hover:via-blue-900/80 group-hover:to-slate-900/60 transition-colors" />
+
+                  <div className="relative z-10 flex items-center gap-3.5">
+                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 ring-2 ring-blue-400/40">
                       <Building2 className="w-7 h-7" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-blue-800 leading-tight">
+                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
                         Bimas Islam
                       </h3>
-                      <p className="text-xs text-slate-500 mt-0.5">Masjid, Mushalla & 10 KUA</p>
+                      <p className="text-xs text-blue-200 mt-0.5 font-medium drop-shadow-xs">Masjid, Mushalla & 10 KUA</p>
                     </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-blue-700 transition-colors shrink-0">
+                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
                     <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
@@ -143,20 +161,29 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                 {/* 3. Bimas Kristen */}
                 <button
                   onClick={() => handleSectorClick('bimas-kristen')}
-                  className="group relative bg-white/95 hover:bg-white rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl border border-slate-200/90 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-purple-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-purple-400"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-purple-600 to-purple-800 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0 font-serif text-2xl font-black">
+                  {/* Thematic Background Photo: Church Sanctuary Architecture */}
+                  <img 
+                    src="https://images.unsplash.com/photo-1548625361-195fe5786f4a?auto=format&fit=crop&w=800&q=80" 
+                    alt="Bimas Kristen Background" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                  />
+                  {/* Rich Gradient Overlay for WCAG AA Readability */}
+                  <div className="absolute inset-0 bg-linear-to-r from-purple-950/95 via-purple-950/85 to-slate-950/70 group-hover:from-purple-950/90 group-hover:via-purple-900/80 group-hover:to-slate-900/60 transition-colors" />
+
+                  <div className="relative z-10 flex items-center gap-3.5">
+                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-purple-500 to-purple-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 font-serif text-2xl font-black ring-2 ring-purple-400/40">
                       †
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-purple-800 leading-tight">
+                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
                         Bimas Kristen
                       </h3>
-                      <p className="text-xs text-slate-500 mt-0.5">Gereja & Data Umat Kristen</p>
+                      <p className="text-xs text-purple-200 mt-0.5 font-medium drop-shadow-xs">Gereja & Data Umat Kristen</p>
                     </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-purple-700 transition-colors shrink-0">
+                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
                     <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
@@ -164,20 +191,29 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                 {/* 4. Bimas Hindu */}
                 <button
                   onClick={() => handleSectorClick('bimas-hindu')}
-                  className="group relative bg-white/95 hover:bg-white rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl border border-slate-200/90 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-amber-500"
+                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-amber-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-amber-400"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0 font-bold text-2xl">
+                  {/* Thematic Background Photo: Balai Basarah / Hindu Kaharingan Sanctuary */}
+                  <img 
+                    src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80" 
+                    alt="Bimas Hindu Background" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                  />
+                  {/* Rich Gradient Overlay for WCAG AA Readability */}
+                  <div className="absolute inset-0 bg-linear-to-r from-amber-950/95 via-amber-950/85 to-slate-950/70 group-hover:from-amber-950/90 group-hover:via-amber-900/80 group-hover:to-slate-900/60 transition-colors" />
+
+                  <div className="relative z-10 flex items-center gap-3.5">
+                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 font-bold text-2xl ring-2 ring-amber-400/40">
                       ॐ
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-amber-700 leading-tight">
+                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
                         Bimas Hindu
                       </h3>
-                      <p className="text-xs text-slate-500 mt-0.5">Balai Basarah & Kaharingan</p>
+                      <p className="text-xs text-amber-200 mt-0.5 font-medium drop-shadow-xs">Balai Basarah & Kaharingan</p>
                     </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-amber-600 transition-colors shrink-0">
+                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
                     <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
@@ -185,20 +221,29 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                 {/* 5. Bimas Budha */}
                 <button
                   onClick={() => handleSectorClick('bimas-budha')}
-                  className="group relative bg-white/95 hover:bg-white rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl border border-slate-200/90 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-cyan-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-cyan-400"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-cyan-500 to-cyan-700 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0 font-bold text-2xl">
+                  {/* Thematic Background Photo: Serene Vihara / Buddhist Temple */}
+                  <img 
+                    src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=800&q=80" 
+                    alt="Bimas Budha Background" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                  />
+                  {/* Rich Gradient Overlay for WCAG AA Readability */}
+                  <div className="absolute inset-0 bg-linear-to-r from-cyan-950/95 via-cyan-950/85 to-slate-950/70 group-hover:from-cyan-950/90 group-hover:via-cyan-900/80 group-hover:to-slate-900/60 transition-colors" />
+
+                  <div className="relative z-10 flex items-center gap-3.5">
+                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-cyan-500 to-cyan-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 font-bold text-2xl ring-2 ring-cyan-400/40">
                       ☸
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-cyan-700 leading-tight">
+                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
                         Bimas Budha
                       </h3>
-                      <p className="text-xs text-slate-500 mt-0.5">Vihara, Cetiya & Umat Budha</p>
+                      <p className="text-xs text-cyan-200 mt-0.5 font-medium drop-shadow-xs">Vihara, Cetiya & Umat Budha</p>
                     </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-cyan-600 transition-colors shrink-0">
+                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
                     <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
@@ -206,20 +251,29 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                 {/* 6. Kepegawaian & Tata Usaha */}
                 <button
                   onClick={() => handleSectorClick('kepegawaian')}
-                  className="group relative bg-white/95 hover:bg-white rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl border border-slate-200/90 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-emerald-600"
+                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-emerald-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-emerald-400"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-emerald-700 to-emerald-900 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                  {/* Thematic Background Photo: Modern Administrative & Civil Service */}
+                  <img 
+                    src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80" 
+                    alt="Kepegawaian Background" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                  />
+                  {/* Rich Gradient Overlay for WCAG AA Readability */}
+                  <div className="absolute inset-0 bg-linear-to-r from-emerald-950/95 via-emerald-950/85 to-slate-950/70 group-hover:from-emerald-950/90 group-hover:via-emerald-900/80 group-hover:to-slate-900/60 transition-colors" />
+
+                  <div className="relative z-10 flex items-center gap-3.5">
+                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-emerald-600 to-emerald-800 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 ring-2 ring-emerald-400/40">
                       <Users className="w-7 h-7" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-800 leading-tight">
+                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
                         Kepegawaian & Tata Usaha
                       </h3>
-                      <p className="text-xs text-slate-500 mt-0.5">Data ASN, PPPK & PPNPN</p>
+                      <p className="text-xs text-emerald-200 mt-0.5 font-medium drop-shadow-xs">Data ASN, PPPK & PPNPN</p>
                     </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-emerald-800 transition-colors shrink-0">
+                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
                     <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>

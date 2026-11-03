@@ -30,7 +30,6 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectTab,
   onSelectProfilSubTab,
   onSelectSector,
-  onOpenPtspModal,
   portalConfig
 }) => {
   const [profilDropdownOpen, setProfilDropdownOpen] = useState(false);
@@ -38,57 +37,87 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const theme = portalConfig?.headerTheme || 'emerald';
-  const customColor = portalConfig?.customHeaderColor || '#064e3b';
+  const customColor = portalConfig?.customHeaderColor || '#004d34';
 
-  // Dynamic Theme Styling with Rich Gradients & Micro-Bar Palettes
+  // Dynamic Theme Styling with Kementerian Agama Iconic Palettes (Deep Emerald Green & Radiant Gold)
   const getThemeStyles = () => {
     switch (theme) {
       case 'navy':
         return {
-          microBar: 'bg-linear-to-r from-slate-950 via-slate-900 to-blue-950 text-sky-100 border-slate-800',
-          titleGradient: 'from-slate-950 via-blue-900 to-indigo-950',
-          activeIndicator: 'bg-blue-600',
-          accentText: 'text-blue-700',
-          ctaGradient: 'from-blue-700 via-blue-800 to-slate-900 hover:from-blue-600 hover:to-slate-800',
-          navHover: 'hover:text-blue-700'
+          brandingBg: 'bg-linear-to-r from-[#06182c] via-[#0b2742] to-[#06182c]',
+          brandingBorder: 'border-b-2 border-sky-400/40',
+          titleColor: 'text-amber-300',
+          subTitleColor: 'text-white',
+          taglineBadge: 'bg-white/10 text-sky-200 border-sky-400/40',
+          navBg: 'bg-[#040e1a] border-t border-sky-900/60 shadow-md',
+          navText: 'text-slate-200 hover:text-amber-300 hover:bg-white/5',
+          navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
+          activeIndicator: 'bg-amber-400',
+          ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
+          drawerBg: 'bg-[#040e1a] text-white',
+          drawerActive: 'bg-sky-600 text-white'
         };
       case 'forest':
         return {
-          microBar: 'bg-linear-to-r from-[#012018] via-[#022c22] to-[#064e3b] text-emerald-100 border-[#064e3b]/50',
-          titleGradient: 'from-[#022c22] via-[#064e3b] to-teal-900',
-          activeIndicator: 'bg-teal-700',
-          accentText: 'text-teal-800',
-          ctaGradient: 'from-teal-800 via-emerald-800 to-[#022c22] hover:from-teal-700 hover:to-emerald-900',
-          navHover: 'hover:text-teal-800'
+          brandingBg: 'bg-linear-to-r from-[#012018] via-[#023b28] to-[#012018]',
+          brandingBorder: 'border-b-2 border-amber-400/40',
+          titleColor: 'text-amber-300',
+          subTitleColor: 'text-white',
+          taglineBadge: 'bg-emerald-950/80 text-amber-200 border-amber-400/40',
+          navBg: 'bg-[#01140e] border-t border-emerald-900/60 shadow-md',
+          navText: 'text-emerald-100/90 hover:text-amber-300 hover:bg-white/5',
+          navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
+          activeIndicator: 'bg-amber-400',
+          ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
+          drawerBg: 'bg-[#01140e] text-white',
+          drawerActive: 'bg-emerald-600 text-white'
         };
       case 'maroon':
         return {
-          microBar: 'bg-linear-to-r from-[#290505] via-[#3b0707] to-[#4c0519] text-rose-100 border-rose-900/50',
-          titleGradient: 'from-[#4c0519] via-[#881337] to-[#9f1239]',
-          activeIndicator: 'bg-rose-700',
-          accentText: 'text-rose-800',
-          ctaGradient: 'from-rose-700 via-rose-800 to-[#4c0519] hover:from-rose-600 hover:to-rose-900',
-          navHover: 'hover:text-rose-800'
+          brandingBg: 'bg-linear-to-r from-[#290505] via-[#4c0519] to-[#290505]',
+          brandingBorder: 'border-b-2 border-amber-400/40',
+          titleColor: 'text-amber-300',
+          subTitleColor: 'text-white',
+          taglineBadge: 'bg-white/10 text-rose-200 border-amber-400/40',
+          navBg: 'bg-[#1a0307] border-t border-rose-900/60 shadow-md',
+          navText: 'text-rose-100/90 hover:text-amber-300 hover:bg-white/5',
+          navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
+          activeIndicator: 'bg-amber-400',
+          ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
+          drawerBg: 'bg-[#1a0307] text-white',
+          drawerActive: 'bg-rose-700 text-white'
         };
       case 'custom':
         return {
-          microBar: 'text-white border-white/20',
-          microBarStyle: { backgroundColor: customColor },
-          titleGradient: 'from-slate-900 to-slate-800',
-          activeIndicator: 'bg-emerald-600',
-          accentText: 'text-emerald-700',
-          ctaGradient: 'from-emerald-700 to-emerald-800 hover:from-emerald-600',
-          navHover: 'hover:text-emerald-700'
+          brandingBg: 'border-b-2 border-amber-400/40 text-white',
+          brandingStyle: { backgroundColor: customColor },
+          brandingBorder: 'border-b-2 border-amber-400/40',
+          titleColor: 'text-amber-300',
+          subTitleColor: 'text-white',
+          taglineBadge: 'bg-white/10 text-white border-white/30',
+          navBg: 'bg-slate-950 border-t border-white/20 shadow-md',
+          navText: 'text-slate-200 hover:text-amber-300 hover:bg-white/5',
+          navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
+          activeIndicator: 'bg-amber-400',
+          ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
+          drawerBg: 'bg-slate-950 text-white',
+          drawerActive: 'bg-emerald-600 text-white'
         };
       case 'emerald':
       default:
         return {
-          microBar: 'bg-linear-to-r from-[#022c22] via-[#064e3b] to-[#043d2e] text-emerald-100/95 border-emerald-800/60',
-          titleGradient: 'from-emerald-950 via-[#0b5133] to-teal-950',
-          activeIndicator: 'bg-emerald-600',
-          accentText: 'text-emerald-800',
-          ctaGradient: 'from-emerald-600 via-emerald-700 to-teal-800 hover:from-emerald-500 hover:to-teal-700',
-          navHover: 'hover:text-emerald-700'
+          brandingBg: 'bg-linear-to-r from-[#012f20] via-[#004d34] to-[#013524]',
+          brandingBorder: 'border-b-2 border-amber-400/40',
+          titleColor: 'text-amber-300',
+          subTitleColor: 'text-white',
+          taglineBadge: 'bg-emerald-950/80 text-amber-200 border-amber-400/40',
+          navBg: 'bg-[#012519] border-t border-emerald-900/70 shadow-md',
+          navText: 'text-emerald-100/90 hover:text-amber-300 hover:bg-white/5',
+          navActive: 'text-amber-300 font-extrabold bg-white/15 shadow-inner',
+          activeIndicator: 'bg-amber-400',
+          ctaGradient: 'from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-yellow-400',
+          drawerBg: 'bg-[#012519] text-white',
+          drawerActive: 'bg-amber-400 text-slate-950 font-black'
         };
     }
   };
@@ -117,21 +146,28 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-emerald-950/10 shadow-sm transition-all">
+    <header className="sticky top-0 z-50 shadow-lg transition-all">
       
-      {/* MAIN BRANDING BAR: Fresh Luminous Backdrop + Pristine Logo + BerAKHLAK */}
-      <div className="bg-linear-to-b from-white via-emerald-50/25 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* MAIN BRANDING BAR: Characteristic Kementerian Agama Deep Green & Gold Theme */}
+      <div 
+        className={`${themeStyle.brandingBg} ${themeStyle.brandingBorder} relative overflow-hidden`}
+        style={themeStyle.brandingStyle}
+      >
+        {/* Subtle decorative golden-emerald ambient shimmer */}
+        <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-radial from-amber-400/15 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute left-1/3 -bottom-10 w-96 h-24 rounded-full bg-radial from-emerald-400/10 via-transparent to-transparent pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex items-center justify-between gap-4 py-3 sm:py-3.5">
             
-            {/* Left Brand Lockup: Emblem + High Contrast Typography */}
+            {/* Left Brand Lockup: Emblem + Kemenag Gold & White Typography */}
             <button
               onClick={() => handleTabClick('beranda')}
               className="flex items-center gap-3.5 text-left focus:outline-hidden group shrink-0"
               title="Kembali ke Beranda Portal Kemenag Murung Raya"
             >
-              {/* Emblem with subtle golden-emerald ambient glow */}
-              <div className="relative p-1 rounded-2xl bg-white shadow-xs border border-emerald-100/80 group-hover:border-emerald-300 transition-all group-hover:shadow-md">
+              {/* Emblem with crisp gold-trimmed container */}
+              <div className="relative p-1 rounded-2xl bg-white shadow-md border-2 border-amber-400/50 group-hover:border-amber-300 transition-all group-hover:shadow-lg">
                 <OfficialEmblem 
                   size={54} 
                   logoType={portalConfig?.logoType || 'kemenag-ri'}
@@ -142,17 +178,17 @@ export const Header: React.FC<HeaderProps> = ({
 
               {/* Institutional Text Lockup */}
               <div className="flex flex-col">
-                <span className={`text-sm sm:text-base font-black tracking-wide uppercase leading-tight font-sans bg-linear-to-r ${themeStyle.titleGradient} bg-clip-text text-transparent`}>
+                <span className={`text-sm sm:text-base font-black tracking-wider uppercase leading-tight font-sans ${themeStyle.titleColor} drop-shadow-sm`}>
                   {portalConfig?.namaInstansi || 'KEMENTERIAN AGAMA'}
                 </span>
-                <span className="text-xs sm:text-[13px] font-black text-slate-900 tracking-wider uppercase leading-tight mt-0.5">
+                <span className={`text-xs sm:text-[13px] font-black ${themeStyle.subTitleColor} tracking-wider uppercase leading-tight mt-0.5 drop-shadow-2xs`}>
                   {portalConfig?.subInstansi || 'KABUPATEN MURUNG RAYA'}
                 </span>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                  <span className={`text-[10px] font-bold ${themeStyle.taglineBadge} px-2.5 py-0.5 rounded-md border shadow-2xs`}>
                     {portalConfig?.tagline || 'Ikhlas Beramal'}
                   </span>
-                  <span className="text-[10px] text-slate-400 hidden sm:inline">
+                  <span className="text-[10px] text-emerald-200/90 hidden sm:inline font-medium">
                     · Tira Tangka Balang
                   </span>
                 </div>
@@ -160,18 +196,18 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* Center Trust Accent (Desktop): Zona Integritas Seal */}
-            <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-200/70 text-emerald-900 text-xs">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-950/70 border border-amber-400/40 text-amber-200 text-xs shadow-inner backdrop-blur-md">
+              <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
               <div className="flex flex-col text-left">
-                <span className="font-extrabold text-[11px] leading-none text-emerald-950">Zona Integritas</span>
-                <span className="text-[9px] text-emerald-700 font-medium leading-tight">WBK & WBBM Terpercaya</span>
+                <span className="font-extrabold text-[11px] leading-none text-white">Zona Integritas</span>
+                <span className="text-[9px] text-amber-300 font-medium leading-tight">WBK & WBBM Terpercaya</span>
               </div>
             </div>
 
             {/* Right Brand: Kemenag Droplet + BerAKHLAK Official Identity */}
             <div className="flex items-center gap-3 shrink-0">
               
-              <div className="flex items-center gap-3 bg-white/90 border border-slate-200/90 shadow-xs rounded-2xl px-3 py-1.5">
+              <div className="flex items-center gap-3 bg-white border border-amber-300/40 shadow-md rounded-2xl px-3 py-1.5">
                 {/* Official Kemenag Droplet Teardrop Badge */}
                 <div className="flex items-center gap-1.5" title="Kementerian Agama RI">
                   <svg viewBox="0 0 48 58" className="w-7 h-9 drop-shadow-xs" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -211,10 +247,10 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center lg:hidden ml-1">
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2.5 rounded-xl bg-emerald-50 text-emerald-900 border border-emerald-200/80 hover:bg-emerald-100 transition-colors shadow-xs"
+                  className="p-2.5 rounded-xl bg-amber-400 text-slate-950 border border-amber-300 hover:bg-amber-300 transition-colors shadow-md"
                   aria-label="Buka navigasi menu"
                 >
-                  {mobileMenuOpen ? <X className="w-5 h-5 text-emerald-900" /> : <Menu className="w-5 h-5 text-emerald-900" />}
+                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
               </div>
             </div>
@@ -222,20 +258,20 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* 3. NAVIGATION BAR (DESKTOP): Fresh Ribbon with Vibrant Underlines & Rich Dropdowns */}
-      <div className="hidden lg:block border-t border-slate-200/80 bg-linear-to-r from-emerald-50/50 via-white to-emerald-50/50">
+      {/* 3. NAVIGATION BAR (DESKTOP): Characteristic Kemenag Green Ribbon */}
+      <div className={`hidden lg:block ${themeStyle.navBg}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-6 py-2">
             
-            <nav className="flex items-center gap-1 xl:gap-2 text-[13px] font-semibold text-slate-700">
+            <nav className="flex items-center gap-1 xl:gap-2 text-[13px] font-semibold">
               
               {/* Tab: Beranda */}
               <button
                 onClick={() => handleTabClick('beranda')}
-                className={`px-3 py-1.5 rounded-lg transition-all relative ${themeStyle.navHover} ${
+                className={`px-3 py-1.5 rounded-lg transition-all relative ${
                   currentTab === 'beranda' 
-                    ? 'text-emerald-900 font-bold bg-emerald-100/70 shadow-xs' 
-                    : 'hover:bg-slate-100/80'
+                    ? themeStyle.navActive 
+                    : themeStyle.navText
                 }`}
               >
                 Beranda
@@ -251,15 +287,15 @@ export const Header: React.FC<HeaderProps> = ({
                 onMouseLeave={() => setSeksiDropdownOpen(false)}
               >
                 <button
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${themeStyle.navHover} ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
                     currentTab === 'data-informasi' 
-                      ? 'text-emerald-900 font-bold bg-emerald-100/70 shadow-xs' 
-                      : 'hover:bg-slate-100/80'
+                      ? themeStyle.navActive 
+                      : themeStyle.navText
                   }`}
                 >
-                  <Layers className="w-3.5 h-3.5 text-emerald-600" />
+                  <Layers className="w-3.5 h-3.5 text-amber-400" />
                   <span>Layanan Per Seksi</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${seksiDropdownOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${seksiDropdownOpen ? 'rotate-180 text-amber-300' : 'text-emerald-300/70'}`} />
                   {currentTab === 'data-informasi' && (
                     <span className={`absolute bottom-0 left-2 right-2 h-0.5 ${themeStyle.activeIndicator} rounded-full`} />
                   )}
@@ -281,7 +317,7 @@ export const Header: React.FC<HeaderProps> = ({
                         <div className="flex-1">
                           <div className="font-bold text-slate-900 flex items-center justify-between">
                             <span>Pendidikan Islam</span>
-                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-emerald-600 text-white">
+                            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black bg-amber-400 text-slate-950">
                               ONLINE
                             </span>
                           </div>
@@ -374,14 +410,14 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <button
                   onClick={() => handleTabClick('profil')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${themeStyle.navHover} ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
                     currentTab === 'profil' 
-                      ? 'text-emerald-900 font-bold bg-emerald-100/70 shadow-xs' 
-                      : 'hover:bg-slate-100/80'
+                      ? themeStyle.navActive 
+                      : themeStyle.navText
                   }`}
                 >
                   <span>Profil Kemenag</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${profilDropdownOpen ? 'rotate-180 text-emerald-700' : 'text-slate-400'}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${profilDropdownOpen ? 'rotate-180 text-amber-300' : 'text-emerald-300/70'}`} />
                   {currentTab === 'profil' && (
                     <span className={`absolute bottom-0 left-2 right-2 h-0.5 ${themeStyle.activeIndicator} rounded-full`} />
                   )}
@@ -429,10 +465,10 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Tab: Berita Terkini */}
               <button
                 onClick={() => handleTabClick('berita')}
-                className={`px-3 py-1.5 rounded-lg transition-all relative ${themeStyle.navHover} ${
+                className={`px-3 py-1.5 rounded-lg transition-all relative ${
                   currentTab === 'berita' 
-                    ? 'text-emerald-900 font-bold bg-emerald-100/70 shadow-xs' 
-                    : 'hover:bg-slate-100/80'
+                    ? themeStyle.navActive 
+                    : themeStyle.navText
                 }`}
               >
                 Berita Terkini
@@ -444,10 +480,10 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Tab: Pengumuman Resmi */}
               <button
                 onClick={() => handleTabClick('pengumuman')}
-                className={`px-3 py-1.5 rounded-lg transition-all relative ${themeStyle.navHover} ${
+                className={`px-3 py-1.5 rounded-lg transition-all relative ${
                   currentTab === 'pengumuman' 
-                    ? 'text-emerald-900 font-bold bg-emerald-100/70 shadow-xs' 
-                    : 'hover:bg-slate-100/80'
+                    ? themeStyle.navActive 
+                    : themeStyle.navText
                 }`}
               >
                 Pengumuman Resmi
@@ -459,10 +495,10 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Tab: Data & Informasi */}
               <button
                 onClick={() => handleTabClick('data-informasi')}
-                className={`px-3 py-1.5 rounded-lg transition-all relative ${themeStyle.navHover} ${
+                className={`px-3 py-1.5 rounded-lg transition-all relative ${
                   currentTab === 'data-informasi' 
-                    ? 'text-emerald-900 font-bold bg-emerald-100/70 shadow-xs' 
-                    : 'hover:bg-slate-100/80'
+                    ? themeStyle.navActive 
+                    : themeStyle.navText
                 }`}
               >
                 Data & Informasi
@@ -474,10 +510,10 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Tab: Galeri Kegiatan */}
               <button
                 onClick={() => handleTabClick('galeri')}
-                className={`px-3 py-1.5 rounded-lg transition-all relative ${themeStyle.navHover} ${
+                className={`px-3 py-1.5 rounded-lg transition-all relative ${
                   currentTab === 'galeri' 
-                    ? 'text-emerald-900 font-bold bg-emerald-100/70 shadow-xs' 
-                    : 'hover:bg-slate-100/80'
+                    ? themeStyle.navActive 
+                    : themeStyle.navText
                 }`}
               >
                 Galeri Kegiatan
@@ -487,20 +523,20 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </nav>
 
-            {/* CTA Button: Akses Layanan PTSP (Vibrant Gradient with Live Status) */}
+            {/* CTA Button: Akses Layanan PTSP (Radiant Golden Gradient with Live Status) */}
             <div className="flex items-center gap-3">
               <button
                 onClick={() => handleTabClick('ptsp')}
-                className={`flex items-center gap-2.5 px-4 py-2 text-xs font-extrabold rounded-xl transition-all duration-200 shadow-md ${
+                className={`flex items-center gap-2 px-4 py-2 text-xs font-black rounded-xl transition-all duration-200 shadow-md ${
                   currentTab === 'ptsp'
-                    ? 'bg-emerald-950 text-white ring-2 ring-emerald-400 shadow-emerald-900/40'
-                    : `bg-linear-to-r ${themeStyle.ctaGradient} text-white shadow-emerald-700/25 hover:scale-[1.02]`
+                    ? 'bg-amber-300 text-slate-950 ring-2 ring-white shadow-amber-950/50'
+                    : `bg-linear-to-r ${themeStyle.ctaGradient} text-slate-950 shadow-amber-950/40 border border-amber-300/80 hover:scale-[1.02]`
                 }`}
               >
-                <FileText className="w-3.5 h-3.5 text-emerald-200" />
-                <span className="tracking-wide">Layanan PTSP</span>
-                <span className="flex items-center gap-1 text-[9px] bg-black/25 px-2 py-0.5 rounded-full text-emerald-200 border border-emerald-400/30">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <FileText className="w-3.5 h-3.5 text-slate-950" />
+                <span className="tracking-wide text-slate-950 font-black">Layanan PTSP</span>
+                <span className="flex items-center gap-1 text-[9px] bg-slate-950/15 px-2 py-0.5 rounded-full text-slate-950 font-black border border-slate-950/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                   <span>ONLINE</span>
                 </span>
               </button>
@@ -509,68 +545,68 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* MOBILE DRAWER MENU: Fresh Organized Sections & Smooth Controls */}
+      {/* MOBILE DRAWER MENU: Characteristic Kemenag Green Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white/98 backdrop-blur-xl px-4 pt-3 pb-8 shadow-2xl animate-fadeIn">
+        <div className={`lg:hidden ${themeStyle.drawerBg} border-t border-emerald-800/80 px-4 pt-3 pb-8 shadow-2xl animate-fadeIn`}>
           
           <div className="flex flex-col space-y-1">
             <button
               onClick={() => handleTabClick('beranda')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'beranda' ? 'bg-emerald-600 text-white' : 'text-slate-700 hover:bg-slate-50'
+                currentTab === 'beranda' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
               }`}
             >
               Beranda
             </button>
 
             {/* Mobile Layanan Per Seksi Group */}
-            <div className="py-2 bg-slate-50/80 rounded-2xl p-2.5 my-1 border border-slate-100">
-              <div className="px-2 pb-1.5 text-[11px] font-black uppercase tracking-wider text-emerald-800 flex items-center justify-between">
+            <div className="py-2 bg-emerald-950/70 rounded-2xl p-2.5 my-1 border border-emerald-800/60">
+              <div className="px-2 pb-1.5 text-[11px] font-black uppercase tracking-wider text-amber-300 flex items-center justify-between">
                 <span>Layanan Per Seksi (Kemenag Mura)</span>
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-bold">6 Bidang</span>
+                <span className="text-[10px] bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded font-black">6 Bidang</span>
               </div>
               <div className="space-y-1 mt-1">
                 <button
                   onClick={() => handleSeksiClick('pendidikan-islam')}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-700 hover:bg-emerald-100/70 flex items-center justify-between bg-white shadow-2xs"
+                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 hover:bg-emerald-100/90 flex items-center justify-between bg-white shadow-2xs"
                 >
                   <span className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
                     <span>Pendidikan Islam (Pendis)</span>
                   </span>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">SI PENDIS</span>
+                  <span className="text-[10px] font-bold text-emerald-800 bg-amber-300 px-1.5 py-0.5 rounded">SI PENDIS</span>
                 </button>
                 <button
                   onClick={() => handleSeksiClick('bimas-islam')}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-700 hover:bg-blue-100/70 flex items-center gap-2 bg-white shadow-2xs"
+                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 hover:bg-blue-100/90 flex items-center gap-2 bg-white shadow-2xs"
                 >
                   <span className="w-2 h-2 rounded-full bg-blue-600"></span>
                   Bimas Islam & KUA
                 </button>
                 <button
                   onClick={() => handleSeksiClick('bimas-kristen')}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-700 hover:bg-purple-100/70 flex items-center gap-2 bg-white shadow-2xs"
+                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 hover:bg-purple-100/90 flex items-center gap-2 bg-white shadow-2xs"
                 >
                   <span className="w-2 h-2 rounded-full bg-purple-600"></span>
                   Bimas Kristen
                 </button>
                 <button
                   onClick={() => handleSeksiClick('bimas-hindu')}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-700 hover:bg-amber-100/70 flex items-center gap-2 bg-white shadow-2xs"
+                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 hover:bg-amber-100/90 flex items-center gap-2 bg-white shadow-2xs"
                 >
                   <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                   Bimas Hindu
                 </button>
                 <button
                   onClick={() => handleSeksiClick('bimas-budha')}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-700 hover:bg-cyan-100/70 flex items-center gap-2 bg-white shadow-2xs"
+                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 hover:bg-cyan-100/90 flex items-center gap-2 bg-white shadow-2xs"
                 >
                   <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
                   Bimas Budha
                 </button>
                 <button
                   onClick={() => handleSeksiClick('kepegawaian')}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-700 hover:bg-emerald-100/70 flex items-center gap-2 bg-white shadow-2xs"
+                  className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 hover:bg-emerald-100/90 flex items-center gap-2 bg-white shadow-2xs"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-700"></span>
                   Kepegawaian & Tata Usaha
@@ -579,26 +615,26 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* Mobile Profil Group */}
-            <div className="py-2 bg-slate-50/80 rounded-2xl p-2.5 my-1 border border-slate-100">
-              <div className="px-2 pb-1.5 text-[11px] font-black uppercase tracking-wider text-slate-700">
+            <div className="py-2 bg-emerald-950/70 rounded-2xl p-2.5 my-1 border border-emerald-800/60">
+              <div className="px-2 pb-1.5 text-[11px] font-black uppercase tracking-wider text-amber-300">
                 Profil Kantor Kementerian Agama
               </div>
               <div className="space-y-1">
                 <button
                   onClick={() => handleProfilSubClick('visi-misi')}
-                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md text-slate-700 hover:bg-white"
+                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md text-emerald-100 hover:bg-white/10"
                 >
                   · Visi, Misi & Budaya Kerja
                 </button>
                 <button
                   onClick={() => handleProfilSubClick('struktur')}
-                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md text-slate-700 hover:bg-white"
+                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md text-emerald-100 hover:bg-white/10"
                 >
                   · Struktur Organisasi & Tugas
                 </button>
                 <button
                   onClick={() => handleProfilSubClick('pejabat')}
-                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md text-slate-700 hover:bg-white"
+                  className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-md text-emerald-100 hover:bg-white/10"
                 >
                   · Daftar Pejabat Eselon
                 </button>
@@ -608,7 +644,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => handleTabClick('berita')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'berita' ? 'bg-emerald-600 text-white' : 'text-slate-700 hover:bg-slate-50'
+                currentTab === 'berita' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
               }`}
             >
               Berita Terkini
@@ -617,7 +653,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => handleTabClick('pengumuman')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'pengumuman' ? 'bg-emerald-600 text-white' : 'text-slate-700 hover:bg-slate-50'
+                currentTab === 'pengumuman' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
               }`}
             >
               Pengumuman Resmi
@@ -626,7 +662,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => handleTabClick('data-informasi')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'data-informasi' ? 'bg-emerald-600 text-white' : 'text-slate-700 hover:bg-slate-50'
+                currentTab === 'data-informasi' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
               }`}
             >
               Data dan Informasi (Perbidang)
@@ -635,7 +671,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => handleTabClick('galeri')}
               className={`text-left px-3.5 py-2.5 text-sm font-bold rounded-xl transition-colors ${
-                currentTab === 'galeri' ? 'bg-emerald-600 text-white' : 'text-slate-700 hover:bg-slate-50'
+                currentTab === 'galeri' ? themeStyle.drawerActive : 'text-emerald-100 hover:bg-white/10'
               }`}
             >
               Galeri Kegiatan
@@ -645,11 +681,11 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="pt-3">
               <button
                 onClick={() => handleTabClick('ptsp')}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-extrabold text-white bg-linear-to-r from-emerald-600 via-emerald-700 to-teal-800 rounded-xl shadow-md hover:from-emerald-500 hover:to-teal-700"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-black text-slate-950 bg-linear-to-r from-amber-400 via-amber-500 to-yellow-500 rounded-xl shadow-lg border border-amber-300/80"
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="w-4 h-4 text-slate-950" />
                 <span>Akses Layanan PTSP Online</span>
-                <span className="text-[10px] bg-black/20 px-2 py-0.5 rounded-full text-emerald-200 font-bold">
+                <span className="text-[10px] bg-slate-950/20 px-2 py-0.5 rounded-full text-slate-950 font-black">
                   24 JAM
                 </span>
               </button>
