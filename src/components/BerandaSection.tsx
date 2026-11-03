@@ -214,19 +214,19 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
               {/* 3-Line Animated Header: True Letter-by-Letter Sequential Typewriter with Color #00FFF7 */}
               <h1 
                 aria-label="Layanan Kementerian Agama Kabupaten Murung Raya"
-                className="flex flex-col items-center justify-center space-y-1 sm:space-y-2 py-1 select-none"
+                className="flex flex-col items-center justify-center space-y-0.5 sm:space-y-1 py-0.5 select-none"
               >
                 {/* Baris Pertama: Layanan */}
-                <div className="min-h-[2.5rem] sm:min-h-[3.5rem] lg:min-h-[4.25rem] text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-wider flex items-center justify-center flex-wrap leading-tight">
+                <div className="min-h-[1.75rem] sm:min-h-[2.1rem] lg:min-h-[2.4rem] text-xl sm:text-2xl lg:text-3xl font-extrabold uppercase tracking-wider flex items-center justify-center flex-wrap leading-tight">
                   {typedLine1.split('').map((char, idx) => (
                     <span
                       key={`l1-${idx}`}
                       className="inline-block transition-transform duration-150 hover:scale-110"
                       style={{
                         color: '#00FFF7',
-                        WebkitTextStroke: '1.5px #02453b',
+                        WebkitTextStroke: '1px #02453b',
                         paintOrder: 'stroke fill',
-                        textShadow: '0 0 12px rgba(0, 255, 247, 0.5), 0 2px 5px rgba(2, 69, 59, 0.4)',
+                        textShadow: '0 0 8px rgba(0, 255, 247, 0.45), 0 1px 3px rgba(2, 69, 59, 0.35)',
                         whiteSpace: char === ' ' ? 'pre' : 'normal',
                       }}
                     >
@@ -234,21 +234,21 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                     </span>
                   ))}
                   {currentActiveLine === 1 && (
-                    <span className="inline-block w-1.5 h-7 sm:h-11 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_12px_#00FFF7]" />
+                    <span className="inline-block w-1 h-5 sm:h-6 lg:h-7 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_10px_#00FFF7]" />
                   )}
                 </div>
 
                 {/* Baris Kedua: Kementerian Agama */}
-                <div className="min-h-[2.5rem] sm:min-h-[3.5rem] lg:min-h-[4.25rem] text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight flex items-center justify-center flex-wrap leading-tight">
+                <div className="min-h-[1.75rem] sm:min-h-[2.1rem] lg:min-h-[2.4rem] text-xl sm:text-2xl lg:text-3xl font-extrabold uppercase tracking-wider flex items-center justify-center flex-wrap leading-tight">
                   {typedLine2.split('').map((char, idx) => (
                     <span
                       key={`l2-${idx}`}
                       className="inline-block transition-transform duration-150 hover:scale-110"
                       style={{
                         color: '#00FFF7',
-                        WebkitTextStroke: '1.5px #02453b',
+                        WebkitTextStroke: '1px #02453b',
                         paintOrder: 'stroke fill',
-                        textShadow: '0 0 12px rgba(0, 255, 247, 0.5), 0 2px 5px rgba(2, 69, 59, 0.4)',
+                        textShadow: '0 0 8px rgba(0, 255, 247, 0.45), 0 1px 3px rgba(2, 69, 59, 0.35)',
                         whiteSpace: char === ' ' ? 'pre' : 'normal',
                       }}
                     >
@@ -256,21 +256,21 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                     </span>
                   ))}
                   {currentActiveLine === 2 && (
-                    <span className="inline-block w-1.5 h-7 sm:h-11 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_12px_#00FFF7]" />
+                    <span className="inline-block w-1 h-5 sm:h-6 lg:h-7 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_10px_#00FFF7]" />
                   )}
                 </div>
 
                 {/* Baris Ketiga: Kabupaten Murung Raya */}
-                <div className="min-h-[2rem] sm:min-h-[3rem] lg:min-h-[3.75rem] text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-wider flex items-center justify-center flex-wrap leading-tight">
+                <div className="min-h-[1.75rem] sm:min-h-[2.1rem] lg:min-h-[2.4rem] text-xl sm:text-2xl lg:text-3xl font-extrabold uppercase tracking-wider flex items-center justify-center flex-wrap leading-tight">
                   {typedLine3.split('').map((char, idx) => (
                     <span
                       key={`l3-${idx}`}
                       className="inline-block transition-transform duration-150 hover:scale-110"
                       style={{
                         color: '#00FFF7',
-                        WebkitTextStroke: '1.5px #02453b',
+                        WebkitTextStroke: '1px #02453b',
                         paintOrder: 'stroke fill',
-                        textShadow: '0 0 12px rgba(0, 255, 247, 0.5), 0 2px 5px rgba(2, 69, 59, 0.4)',
+                        textShadow: '0 0 8px rgba(0, 255, 247, 0.45), 0 1px 3px rgba(2, 69, 59, 0.35)',
                         whiteSpace: char === ' ' ? 'pre' : 'normal',
                       }}
                     >
@@ -278,7 +278,7 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                     </span>
                   ))}
                   {currentActiveLine === 3 && (
-                    <span className="inline-block w-1.5 h-6 sm:h-9 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_12px_#00FFF7]" />
+                    <span className="inline-block w-1 h-5 sm:h-6 lg:h-7 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_10px_#00FFF7]" />
                   )}
                 </div>
               </h1>
