@@ -206,3 +206,57 @@ export interface ProfilData {
   strukturDasarHukum?: string;
   tugasPimpinan?: string;
 }
+
+export interface LayananCardItem {
+  id: string;
+  judul: string;
+  subjudul: string;
+  sektor: DataSectorTab;
+  badge?: string;
+  bgImageUrl: string;
+  iconType: 'pendidikan' | 'masjid' | 'gereja' | 'hindu' | 'budha' | 'kepegawaian';
+}
+
+export interface BerandaContentData {
+  // 1. Hero Title & Text
+  heroGreeting: string;
+  heroLine1: string;
+  heroLine2: string;
+  heroLine3: string;
+  heroBadgeText: string;
+  heroTextColor: string;
+
+  // 2. 6 Kartu Layanan Bidang
+  layananCards: LayananCardItem[];
+
+  // 3. PTSP Terintegrasi
+  ptspBadge: string;
+  ptspJudul: string;
+  ptspDeskripsi: string;
+  ptspUrlInternalTab: string;
+  ptspUrlTabBaru: string;
+  ptspPoinMutu: string[];
+
+  // 4. Sambutan Kepala Kantor & Profil Preview
+  kepalaNama: string;
+  kepalaGelar?: string;
+  kepalaJabatan: string;
+  kepalaNip: string;
+  kepalaFotoUrl?: string;
+  kepalaSalam: string;
+  kepalaSambutanParagraf1: string;
+  kepalaSambutanParagraf2: string;
+  kepalaKota: string;
+
+  // 5. Profil Lembaga Preview
+  profilTeaserBadge: string;
+  profilTeaserJudul: string;
+  profilTeaserDeskripsi: string;
+
+  // 6. Maklumat Pelayanan
+  maklumatJudul: string;
+  maklumatTeks: string;
+  maklumatZonaLabel: string;
+  maklumatZonaStatus: string;
+}
+

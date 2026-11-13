@@ -1,5 +1,6 @@
 export type AdminTab = 
   | 'ringkasan' 
+  | 'kelola-beranda'
   | 'kelola-profil'
   | 'kelola-berita' 
   | 'kelola-pengumuman' 

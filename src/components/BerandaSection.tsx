@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Berita, Pengumuman, NavigationTab, ProfilSubTab, DataSectorTab, GaleriKegiatan } from '../types';
+import { 
+  Berita, 
+  Pengumuman, 
+  NavigationTab, 
+  ProfilSubTab, 
+  DataSectorTab, 
+  GaleriKegiatan,
+  BerandaContentData 
+} from '../types';
+import { INITIAL_BERANDA_CONTENT } from '../data/mockData';
 import { 
   Building2, 
   GraduationCap, 
@@ -16,38 +25,46 @@ import {
   Clock,
   Sparkles,
   Camera,
-  RefreshCw
+  RefreshCw,
+  Edit3
 } from 'lucide-react';
 
 interface BerandaSectionProps {
   beritaList: Berita[];
   pengumumanList: Pengumuman[];
   galeriList?: GaleriKegiatan[];
+  berandaContent?: BerandaContentData;
   onSelectTab: (tab: NavigationTab) => void;
   onSelectProfilSubTab: (subTab: ProfilSubTab) => void;
   onSelectSector?: (sector: DataSectorTab) => void;
   onReadBerita: (berita: Berita) => void;
   onViewPengumuman: (pengumuman: Pengumuman) => void;
   onOpenPtspModal?: () => void;
+  onEditBeranda?: () => void;
+  isSuperAdmin?: boolean;
 }
 
 export const BerandaSection: React.FC<BerandaSectionProps> = ({
   beritaList,
   pengumumanList,
   galeriList = [],
+  berandaContent,
   onSelectTab,
   onSelectProfilSubTab,
   onSelectSector,
   onReadBerita,
   onViewPengumuman,
-  onOpenPtspModal
+  onOpenPtspModal,
+  onEditBeranda,
+  isSuperAdmin = false
 }) => {
+  const content = berandaContent || INITIAL_BERANDA_CONTENT;
   const [heroAnimKey, setHeroAnimKey] = useState(0);
 
   // Typewriter sequential typing state (100% letter-by-letter typing)
-  const FULL_LINE_1 = "Layanan";
-  const FULL_LINE_2 = "Kementerian Agama";
-  const FULL_LINE_3 = "Kabupaten Murung Raya";
+  const FULL_LINE_1 = content.heroLine1 || "Layanan";
+  const FULL_LINE_2 = content.heroLine2 || "Kementerian Agama";
+  const FULL_LINE_3 = content.heroLine3 || "Kabupaten Murung Raya";
 
   const [typedLine1, setTypedLine1] = useState('');
   const [typedLine2, setTypedLine2] = useState('');
@@ -140,7 +157,7 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
     return () => {
       isCancelled = true;
     };
-  }, [heroAnimKey]);
+  }, [heroAnimKey, FULL_LINE_1, FULL_LINE_2, FULL_LINE_3]);
 
   const featuredBerita = beritaList[0];
   const secondaryBerita = beritaList.slice(1, 4);
@@ -155,9 +172,54 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const renderCardIcon = (iconType: string) => {
+    switch (iconType) {
+      case 'pendidikan':
+        return <GraduationCap className="w-7 h-7" />;
+      case 'masjid':
+        return <Building2 className="w-7 h-7" />;
+      case 'gereja':
+        return <span className="font-serif text-2xl font-black">†</span>;
+      case 'hindu':
+        return <span className="font-bold text-2xl">ॐ</span>;
+      case 'budha':
+        return <span className="font-bold text-2xl">☸</span>;
+      case 'kepegawaian':
+      default:
+        return <Users className="w-7 h-7" />;
+    }
+  };
+
+  const heroColor = content.heroTextColor || '#00FFF7';
+
   return (
     <div className="space-y-14 pb-16">
       
+      {/* Super Admin Quick Direct Editing Bar */}
+      {isSuperAdmin && onEditBeranda && (
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4">
+          <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white rounded-2xl p-3.5 sm:px-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg border border-emerald-600/50">
+            <div className="flex items-center gap-3 text-xs sm:text-sm">
+              <span className="flex h-3 w-3 relative shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
+              </span>
+              <span>
+                <strong>Akses Super Admin Aktif:</strong> Anda dapat mengedit seluruh judul, teks sambutan, poin PTSP, dan foto background Beranda di Dashboard Admin.
+              </span>
+            </div>
+            <button
+              onClick={onEditBeranda}
+              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+            >
+              <Edit3 className="w-4 h-4 text-slate-950" />
+              <span>Buka Menu Edit Beranda</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ========================================================
           HERO BANNER - REPLICATING OFFICIAL IMAGE
           "Selamat Datang di Layanan Kementerian Agama"
@@ -198,12 +260,12 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
               
               <div className="flex items-center justify-center gap-2.5">
                 <span className="font-serif italic text-2xl sm:text-3xl lg:text-4xl text-[#0b5133] tracking-wide font-medium">
-                  Selamat Datang di
+                  {content.heroGreeting || "Selamat Datang di"}
                 </span>
                 <button
                   type="button"
                   onClick={() => setHeroAnimKey(k => k + 1)}
-                  className="p-1.5 rounded-full text-emerald-800 hover:text-amber-800 hover:bg-emerald-50 bg-white border-2 border-emerald-400/50 hover:border-amber-400 transition-all hover:rotate-180 duration-500 shadow-2xs"
+                  className="p-1.5 rounded-full text-emerald-800 hover:text-amber-800 hover:bg-emerald-50 bg-white border-2 border-emerald-400/50 hover:border-amber-400 transition-all hover:rotate-180 duration-500 shadow-2xs cursor-pointer"
                   title="Ketik ulang animasi huruf satu per satu"
                   aria-label="Ketik ulang animasi huruf satu per satu"
                 >
@@ -211,9 +273,9 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                 </button>
               </div>
 
-              {/* 3-Line Animated Header: True Letter-by-Letter Sequential Typewriter with Color #00FFF7 */}
+              {/* 3-Line Animated Header: True Letter-by-Letter Sequential Typewriter with Color */}
               <h1 
-                aria-label="Layanan Kementerian Agama Kabupaten Murung Raya"
+                aria-label={`${FULL_LINE_1} ${FULL_LINE_2} ${FULL_LINE_3}`}
                 className="flex flex-col items-center justify-center space-y-0.5 sm:space-y-1 py-0.5 select-none"
               >
                 {/* Baris Pertama: Layanan */}
@@ -223,10 +285,10 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                       key={`l1-${idx}`}
                       className="inline-block transition-transform duration-150 hover:scale-110"
                       style={{
-                        color: '#00FFF7',
+                        color: heroColor,
                         WebkitTextStroke: '1px #02453b',
                         paintOrder: 'stroke fill',
-                        textShadow: '0 0 8px rgba(0, 255, 247, 0.45), 0 1px 3px rgba(2, 69, 59, 0.35)',
+                        textShadow: `0 0 8px ${heroColor}73, 0 1px 3px rgba(2, 69, 59, 0.35)`,
                         whiteSpace: char === ' ' ? 'pre' : 'normal',
                       }}
                     >
@@ -234,7 +296,10 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                     </span>
                   ))}
                   {currentActiveLine === 1 && (
-                    <span className="inline-block w-1 h-5 sm:h-6 lg:h-7 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_10px_#00FFF7]" />
+                    <span 
+                      className="inline-block w-1 h-5 sm:h-6 lg:h-7 animate-pulse ml-1 align-middle rounded-full"
+                      style={{ backgroundColor: heroColor, boxShadow: `0 0 10px ${heroColor}` }}
+                    />
                   )}
                 </div>
 
@@ -245,10 +310,10 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                       key={`l2-${idx}`}
                       className="inline-block transition-transform duration-150 hover:scale-110"
                       style={{
-                        color: '#00FFF7',
+                        color: heroColor,
                         WebkitTextStroke: '1px #02453b',
                         paintOrder: 'stroke fill',
-                        textShadow: '0 0 8px rgba(0, 255, 247, 0.45), 0 1px 3px rgba(2, 69, 59, 0.35)',
+                        textShadow: `0 0 8px ${heroColor}73, 0 1px 3px rgba(2, 69, 59, 0.35)`,
                         whiteSpace: char === ' ' ? 'pre' : 'normal',
                       }}
                     >
@@ -256,7 +321,10 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                     </span>
                   ))}
                   {currentActiveLine === 2 && (
-                    <span className="inline-block w-1 h-5 sm:h-6 lg:h-7 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_10px_#00FFF7]" />
+                    <span 
+                      className="inline-block w-1 h-5 sm:h-6 lg:h-7 animate-pulse ml-1 align-middle rounded-full"
+                      style={{ backgroundColor: heroColor, boxShadow: `0 0 10px ${heroColor}` }}
+                    />
                   )}
                 </div>
 
@@ -267,10 +335,10 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                       key={`l3-${idx}`}
                       className="inline-block transition-transform duration-150 hover:scale-110"
                       style={{
-                        color: '#00FFF7',
+                        color: heroColor,
                         WebkitTextStroke: '1px #02453b',
                         paintOrder: 'stroke fill',
-                        textShadow: '0 0 8px rgba(0, 255, 247, 0.45), 0 1px 3px rgba(2, 69, 59, 0.35)',
+                        textShadow: `0 0 8px ${heroColor}73, 0 1px 3px rgba(2, 69, 59, 0.35)`,
                         whiteSpace: char === ' ' ? 'pre' : 'normal',
                       }}
                     >
@@ -278,7 +346,10 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                     </span>
                   ))}
                   {currentActiveLine === 3 && (
-                    <span className="inline-block w-1 h-5 sm:h-6 lg:h-7 bg-[#00FFF7] animate-pulse ml-1 align-middle rounded-full shadow-[0_0_10px_#00FFF7]" />
+                    <span 
+                      className="inline-block w-1 h-5 sm:h-6 lg:h-7 animate-pulse ml-1 align-middle rounded-full"
+                      style={{ backgroundColor: heroColor, boxShadow: `0 0 10px ${heroColor}` }}
+                    />
                   )}
                 </div>
               </h1>
@@ -286,200 +357,52 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
               <div className="inline-block pt-1">
                 <span className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-[#0a5234] text-white text-xs sm:text-sm font-semibold tracking-wide shadow-md border-2 border-emerald-600/40">
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>Pelayanan Profesional, Transparan dan Berintegritas</span>
+                  <span>{content.heroBadgeText || "Pelayanan Profesional, Transparan dan Berintegritas"}</span>
                 </span>
               </div>
             </div>
 
-            {/* 6 OFFICIAL SECTION CARDS (2 rows x 3 columns) */}
+            {/* 6 OFFICIAL SECTION CARDS (Dynamic & Customizable by Super Admin) */}
             <div className="relative z-10 my-8 px-4 sm:px-10 lg:px-16 max-w-6xl mx-auto w-full">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-                
-                {/* 1. Pendidikan Islam (Direct Integration to sipendismura.my.id) */}
-                <button
-                  onClick={() => handleSectorClick('pendidikan-islam')}
-                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-emerald-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-emerald-400"
-                >
-                  {/* Thematic Background Photo: Madrasah / Islamic Education */}
-                  <img 
-                    src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80" 
-                    alt="Pendidikan Islam Background" 
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
-                  />
-                  {/* Rich Gradient Overlay for WCAG AA Readability */}
-                  <div className="absolute inset-0 bg-linear-to-r from-emerald-950/95 via-emerald-950/85 to-slate-950/70 group-hover:from-emerald-950/90 group-hover:via-emerald-900/80 group-hover:to-slate-900/60 transition-colors" />
+                {content.layananCards.map((card) => (
+                  <button
+                    key={card.id}
+                    onClick={() => handleSectorClick(card.sektor)}
+                    className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-emerald-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-emerald-400 cursor-pointer"
+                  >
+                    {/* Thematic Background Photo with Hover Scale */}
+                    <img 
+                      src={card.bgImageUrl} 
+                      alt={`${card.judul} Background`} 
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                    />
+                    {/* Rich Gradient Overlay for WCAG AA Readability */}
+                    <div className="absolute inset-0 bg-linear-to-r from-emerald-950/95 via-emerald-950/85 to-slate-950/70 group-hover:from-emerald-950/90 group-hover:via-emerald-900/80 group-hover:to-slate-900/60 transition-colors" />
 
-                  <div className="relative z-10 flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 ring-2 ring-emerald-400/40">
-                      <GraduationCap className="w-7 h-7" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
-                          Pendidikan Islam
-                        </h3>
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">
-                          Online
-                        </span>
+                    <div className="relative z-10 flex items-center gap-3.5">
+                      <div className="w-13 h-13 rounded-full bg-linear-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 ring-2 ring-emerald-400/40">
+                        {renderCardIcon(card.iconType)}
                       </div>
-                      <p className="text-xs text-emerald-200 font-semibold mt-0.5 drop-shadow-xs">SI PENDIS (sipendismura.my.id)</p>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
+                            {card.judul}
+                          </h3>
+                          {card.badge && (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">
+                              {card.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-emerald-200 font-semibold mt-0.5 drop-shadow-xs">{card.subjudul}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
-
-                {/* 2. Bimas Islam */}
-                <button
-                  onClick={() => handleSectorClick('bimas-islam')}
-                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-blue-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-blue-400"
-                >
-                  {/* Thematic Background Photo: Grand Mosque & Islamic Architecture */}
-                  <img 
-                    src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" 
-                    alt="Bimas Islam Background" 
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
-                  />
-                  {/* Rich Gradient Overlay for WCAG AA Readability */}
-                  <div className="absolute inset-0 bg-linear-to-r from-blue-950/95 via-blue-950/85 to-slate-950/70 group-hover:from-blue-950/90 group-hover:via-blue-900/80 group-hover:to-slate-900/60 transition-colors" />
-
-                  <div className="relative z-10 flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 ring-2 ring-blue-400/40">
-                      <Building2 className="w-7 h-7" />
+                    <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                     </div>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
-                        Bimas Islam
-                      </h3>
-                      <p className="text-xs text-blue-200 mt-0.5 font-medium drop-shadow-xs">Masjid, Mushalla & 10 KUA</p>
-                    </div>
-                  </div>
-                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
-
-                {/* 3. Bimas Kristen */}
-                <button
-                  onClick={() => handleSectorClick('bimas-kristen')}
-                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-purple-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-purple-400"
-                >
-                  {/* Thematic Background Photo: Church Sanctuary Architecture */}
-                  <img 
-                    src="https://images.unsplash.com/photo-1548625361-195fe5786f4a?auto=format&fit=crop&w=800&q=80" 
-                    alt="Bimas Kristen Background" 
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
-                  />
-                  {/* Rich Gradient Overlay for WCAG AA Readability */}
-                  <div className="absolute inset-0 bg-linear-to-r from-purple-950/95 via-purple-950/85 to-slate-950/70 group-hover:from-purple-950/90 group-hover:via-purple-900/80 group-hover:to-slate-900/60 transition-colors" />
-
-                  <div className="relative z-10 flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-purple-500 to-purple-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 font-serif text-2xl font-black ring-2 ring-purple-400/40">
-                      †
-                    </div>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
-                        Bimas Kristen
-                      </h3>
-                      <p className="text-xs text-purple-200 mt-0.5 font-medium drop-shadow-xs">Gereja & Data Umat Kristen</p>
-                    </div>
-                  </div>
-                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
-
-                {/* 4. Bimas Hindu */}
-                <button
-                  onClick={() => handleSectorClick('bimas-hindu')}
-                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-amber-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-amber-400"
-                >
-                  {/* Thematic Background Photo: Balai Basarah / Hindu Kaharingan Sanctuary */}
-                  <img 
-                    src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80" 
-                    alt="Bimas Hindu Background" 
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
-                  />
-                  {/* Rich Gradient Overlay for WCAG AA Readability */}
-                  <div className="absolute inset-0 bg-linear-to-r from-amber-950/95 via-amber-950/85 to-slate-950/70 group-hover:from-amber-950/90 group-hover:via-amber-900/80 group-hover:to-slate-900/60 transition-colors" />
-
-                  <div className="relative z-10 flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 font-bold text-2xl ring-2 ring-amber-400/40">
-                      ॐ
-                    </div>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
-                        Bimas Hindu
-                      </h3>
-                      <p className="text-xs text-amber-200 mt-0.5 font-medium drop-shadow-xs">Balai Basarah & Kaharingan</p>
-                    </div>
-                  </div>
-                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
-
-                {/* 5. Bimas Budha */}
-                <button
-                  onClick={() => handleSectorClick('bimas-budha')}
-                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-cyan-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-cyan-400"
-                >
-                  {/* Thematic Background Photo: Serene Vihara / Buddhist Temple */}
-                  <img 
-                    src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=800&q=80" 
-                    alt="Bimas Budha Background" 
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
-                  />
-                  {/* Rich Gradient Overlay for WCAG AA Readability */}
-                  <div className="absolute inset-0 bg-linear-to-r from-cyan-950/95 via-cyan-950/85 to-slate-950/70 group-hover:from-cyan-950/90 group-hover:via-cyan-900/80 group-hover:to-slate-900/60 transition-colors" />
-
-                  <div className="relative z-10 flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-cyan-500 to-cyan-700 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 font-bold text-2xl ring-2 ring-cyan-400/40">
-                      ☸
-                    </div>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
-                        Bimas Budha
-                      </h3>
-                      <p className="text-xs text-cyan-200 mt-0.5 font-medium drop-shadow-xs">Vihara, Cetiya & Umat Budha</p>
-                    </div>
-                  </div>
-                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
-
-                {/* 6. Kepegawaian & Tata Usaha */}
-                <button
-                  onClick={() => handleSectorClick('kepegawaian')}
-                  className="group relative overflow-hidden rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-2xl border border-emerald-500/30 transition-all duration-300 flex items-center justify-between text-left hover:-translate-y-1 focus:outline-hidden focus:ring-2 focus:ring-emerald-400"
-                >
-                  {/* Thematic Background Photo: Modern Administrative & Civil Service */}
-                  <img 
-                    src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80" 
-                    alt="Kepegawaian Background" 
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
-                  />
-                  {/* Rich Gradient Overlay for WCAG AA Readability */}
-                  <div className="absolute inset-0 bg-linear-to-r from-emerald-950/95 via-emerald-950/85 to-slate-950/70 group-hover:from-emerald-950/90 group-hover:via-emerald-900/80 group-hover:to-slate-900/60 transition-colors" />
-
-                  <div className="relative z-10 flex items-center gap-3.5">
-                    <div className="w-13 h-13 rounded-full bg-linear-to-br from-emerald-600 to-emerald-800 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform shrink-0 ring-2 ring-emerald-400/40">
-                      <Users className="w-7 h-7" />
-                    </div>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 leading-tight transition-colors drop-shadow-sm">
-                        Kepegawaian & Tata Usaha
-                      </h3>
-                      <p className="text-xs text-emerald-200 mt-0.5 font-medium drop-shadow-xs">Data ASN, PPPK & PPNPN</p>
-                    </div>
-                  </div>
-                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25 flex items-center justify-center group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all shrink-0 shadow-md">
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
-
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -499,21 +422,21 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
             <div className="lg:col-span-8 space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 text-amber-300 text-xs font-semibold border border-emerald-600/50">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Pelayanan Terpadu Satu Pintu (PTSP) Online Resmi</span>
+                <span>{content.ptspBadge}</span>
               </div>
 
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
-                Urus Izin & Permohonan Keagamaan Kini Lebih Mudah Tanpa Antre
+                {content.ptspJudul}
               </h2>
 
               <p className="text-sm sm:text-base text-emerald-100 leading-relaxed max-w-2xl">
-                Akses seluruh permohonan rekomendasi nikah, izin operasional madrasah/pesantren, kalibrasi arah kiblat, bantuan rumah ibadah, hingga legalisir dokumen resmi melalui portal PTSP Kemenag Murung Raya.
+                {content.ptspDeskripsi}
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <button
                   onClick={() => onSelectTab('ptsp')}
-                  className="px-6 py-3 text-xs sm:text-sm font-bold text-emerald-950 bg-amber-400 hover:bg-amber-300 rounded-xl shadow-lg transition-all flex items-center gap-2"
+                  className="px-6 py-3 text-xs sm:text-sm font-bold text-emerald-950 bg-amber-400 hover:bg-amber-300 rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <FileText className="w-4 h-4" />
                   <span>Buka Layanan PTSP (Dalam Portal)</span>
@@ -521,7 +444,7 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                 </button>
 
                 <a
-                  href="https://ptsp-kemenag-mura.vercel.app/"
+                  href={content.ptspUrlTabBaru || "https://ptsp-kemenag-mura.vercel.app/"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-5 py-3 text-xs sm:text-sm font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-colors flex items-center gap-2"
@@ -538,22 +461,12 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                 <span>Standar Mutu Pelayanan PTSP:</span>
               </div>
               <ul className="space-y-2 text-emerald-100">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Biaya 0 Rupiah (Gratis / Bebas Pungli)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Pelacakan Status Berkas Real-time</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Tanda Tangan Elektronik (TTE) Tersertifikasi</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Respon Cepat Petugas & Notifikasi SMS/WA</span>
-                </li>
+                {(content.ptspPoinMutu || []).map((point, pIdx) => (
+                  <li key={pIdx} className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>{point}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -570,29 +483,49 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
           <div className="lg:col-span-5">
             <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-200">
               <div className="flex items-center gap-4 pb-5 border-b border-slate-100">
-                <div className="w-16 h-16 rounded-2xl bg-emerald-800 text-white flex items-center justify-center font-black text-2xl ring-4 ring-emerald-100 shrink-0">
-                  MR
+                <div className="w-16 h-16 rounded-2xl bg-emerald-800 text-white flex items-center justify-center font-black text-2xl ring-4 ring-emerald-100 shrink-0 overflow-hidden">
+                  {content.kepalaFotoUrl ? (
+                    <img 
+                      src={content.kepalaFotoUrl} 
+                      alt={content.kepalaNama} 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <span>
+                      {content.kepalaNama
+                        .split(' ')
+                        .filter(p => !p.includes('.') && p.length > 0)
+                        .map(p => p[0])
+                        .slice(0, 2)
+                        .join('') || 'MR'}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
-                    H. Marzuki Rahman, S.Ag., M.Pd.I
+                    {content.kepalaNama}
                   </h3>
                   <p className="text-xs text-emerald-700 font-semibold mt-0.5">
-                    Kepala Kantor Kemenag Kab. Murung Raya
+                    {content.kepalaJabatan}
                   </p>
                   <p className="text-[11px] text-slate-500 font-mono">
-                    NIP. 197205141999031003
+                    {content.kepalaNip.startsWith('NIP') ? content.kepalaNip : `NIP. ${content.kepalaNip}`}
                   </p>
                 </div>
               </div>
 
               <div className="mt-4 space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
                 <p className="italic text-slate-800 font-medium">
-                  "Assalamu'alaikum Warahmatullahi Wabarakatuh, Salam Sejahtera, Shalom, Om Swastyastu, Namo Buddhaya, Salam Kebajikan."
+                  {content.kepalaSalam}
                 </p>
                 <p>
-                  Selamat datang di portal informasi resmi Kementerian Agama Kabupaten Murung Raya. Kami berkomitmen memberikan keterbukaan informasi publik dan mempercepat transformasi digital tata kelola data keagamaan serta pendidikan madrasah di seluruh penjuru Tira Tangka Balang.
+                  {content.kepalaSambutanParagraf1}
                 </p>
+                {content.kepalaSambutanParagraf2 && (
+                  <p>
+                    {content.kepalaSambutanParagraf2}
+                  </p>
+                )}
               </div>
 
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
@@ -601,12 +534,12 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
                     onSelectTab('profil');
                     onSelectProfilSubTab('pejabat');
                   }}
-                  className="text-xs font-bold text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5"
+                  className="text-xs font-bold text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>Lihat Daftar Pejabat Eselon</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
-                <span className="text-[11px] text-slate-400">Puruk Cahu</span>
+                <span className="text-[11px] text-slate-400">{content.kepalaKota}</span>
               </div>
             </div>
           </div>
@@ -616,13 +549,13 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
             <div>
               <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2">
                 <Building2 className="w-4 h-4 text-emerald-700" />
-                <span>Profil Lembaga</span>
+                <span>{content.profilTeaserBadge || "Profil Lembaga"}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                Membangun Masyarakat Saleh, Moderat, Cerdas, dan Unggul
+                {content.profilTeaserJudul}
               </h2>
               <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                Kantor Kementerian Agama Kabupaten Murung Raya menaungi pembinaan kerukunan hidup beragama, bimbingan masyarakat lintas agama, pengelolaan 10 KUA Kecamatan, serta pendidikan madrasah dan pondok pesantren.
+                {content.profilTeaserDeskripsi}
               </p>
             </div>
 
@@ -827,14 +760,14 @@ export const BerandaSection: React.FC<BerandaSectionProps> = ({
             <div className="bg-slate-900 text-white rounded-2xl p-5 space-y-3 shadow-md">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Maklumat Pelayanan</span>
+                <span>{content.maklumatJudul}</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                "Dengan ini kami segenap aparatur Kantor Kementerian Agama Kabupaten Murung Raya menyatakan sanggup menyelenggarakan pelayanan publik sesuai standar pelayanan yang telah ditetapkan."
+              <p className="text-xs text-slate-300 leading-relaxed italic">
+                {content.maklumatTeks}
               </p>
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <span>Zona Integritas</span>
-                <span className="font-bold text-emerald-400">WBK - WBBM</span>
+                <span>{content.maklumatZonaLabel}</span>
+                <span className="font-bold text-emerald-400">{content.maklumatZonaStatus}</span>
               </div>
             </div>
 

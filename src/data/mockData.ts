@@ -9,7 +9,8 @@ import {
   Berita, 
   Pengumuman, 
   PejabatEselon, 
-  GaleriKegiatan 
+  GaleriKegiatan,
+  BerandaContentData 
 } from '../types';
 
 export const PROFIL_DATA = {
@@ -1264,3 +1265,95 @@ export const INITIAL_GALERI: GaleriKegiatan[] = [
     tags: ["Hindu Kaharingan", "Balai Basarah", "Saripoi", "Kearifan Lokal"]
   }
 ];
+
+export const INITIAL_BERANDA_CONTENT: BerandaContentData = {
+  heroGreeting: "Selamat Datang di",
+  heroLine1: "Layanan",
+  heroLine2: "Kementerian Agama",
+  heroLine3: "Kabupaten Murung Raya",
+  heroBadgeText: "Pelayanan Profesional, Transparan dan Berintegritas",
+  heroTextColor: "#00FFF7",
+
+  layananCards: [
+    {
+      id: "card-1",
+      judul: "Pendidikan Islam",
+      subjudul: "SI PENDIS (sipendismura.my.id)",
+      sektor: "pendidikan-islam",
+      badge: "Online",
+      bgImageUrl: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80",
+      iconType: "pendidikan"
+    },
+    {
+      id: "card-2",
+      judul: "Bimas Islam",
+      subjudul: "Masjid, Mushalla & 10 KUA",
+      sektor: "bimas-islam",
+      bgImageUrl: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80",
+      iconType: "masjid"
+    },
+    {
+      id: "card-3",
+      judul: "Bimas Kristen",
+      subjudul: "Gereja & Data Umat Kristen",
+      sektor: "bimas-kristen",
+      bgImageUrl: "https://images.unsplash.com/photo-1548625361-195fe5786f4a?auto=format&fit=crop&w=800&q=80",
+      iconType: "gereja"
+    },
+    {
+      id: "card-4",
+      judul: "Bimas Hindu",
+      subjudul: "Balai Basarah & Kaharingan",
+      sektor: "bimas-hindu",
+      bgImageUrl: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
+      iconType: "hindu"
+    },
+    {
+      id: "card-5",
+      judul: "Bimas Budha",
+      subjudul: "Vihara, Cetiya & Umat Budha",
+      sektor: "bimas-budha",
+      bgImageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=800&q=80",
+      iconType: "budha"
+    },
+    {
+      id: "card-6",
+      judul: "Kepegawaian & Tata Usaha",
+      subjudul: "Data ASN, PPPK & PPNPN",
+      sektor: "kepegawaian",
+      bgImageUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+      iconType: "kepegawaian"
+    }
+  ],
+
+  ptspBadge: "Pelayanan Terpadu Satu Pintu (PTSP) Online Resmi",
+  ptspJudul: "Urus Izin & Permohonan Keagamaan Kini Lebih Mudah Tanpa Antre",
+  ptspDeskripsi: "Akses seluruh permohonan rekomendasi nikah, izin operasional madrasah/pesantren, kalibrasi arah kiblat, bantuan rumah ibadah, hingga legalisir dokumen resmi melalui portal PTSP Kemenag Murung Raya.",
+  ptspUrlInternalTab: "ptsp",
+  ptspUrlTabBaru: "https://ptsp-kemenag-mura.vercel.app/",
+  ptspPoinMutu: [
+    "Biaya 0 Rupiah (Gratis / Bebas Pungli)",
+    "Pelacakan Status Berkas Real-time",
+    "Tanda Tangan Elektronik (TTE) Tersertifikasi",
+    "Respon Cepat Petugas & Notifikasi SMS/WA"
+  ],
+
+  kepalaNama: "H. Marzuki Rahman, S.Ag., M.Pd.I",
+  kepalaJabatan: "Kepala Kantor Kemenag Kab. Murung Raya",
+  kepalaNip: "197205141999031003",
+  kepalaFotoUrl: "",
+  kepalaSalam: "\"Assalamu'alaikum Warahmatullahi Wabarakatuh, Salam Sejahtera, Shalom, Om Swastyastu, Namo Buddhaya, Salam Kebajikan.\"",
+  kepalaSambutanParagraf1: "Selamat datang di portal informasi resmi Kementerian Agama Kabupaten Murung Raya. Kami berkomitmen memberikan keterbukaan informasi publik dan mempercepat transformasi digital tata kelola data keagamaan serta pendidikan madrasah di seluruh penjuru Tira Tangka Balang.",
+  kepalaSambutanParagraf2: "Melalui portal ini, masyarakat dapat mengakses data rumah ibadah, sekolah keagamaan, permohonan layanan PTSP tanpa dipungut biaya (0 Rupiah), serta menyimak warta kegiatan resmi kedinasan secara transparan dan akuntabel.",
+  kepalaKota: "Puruk Cahu",
+
+  profilTeaserBadge: "Profil Lembaga",
+  profilTeaserJudul: "Membangun Masyarakat Saleh, Moderat, Cerdas, dan Unggul",
+  profilTeaserDeskripsi: "Kantor Kementerian Agama Kabupaten Murung Raya menaungi pembinaan kerukunan hidup beragama, bimbingan masyarakat lintas agama, pengelolaan 10 KUA Kecamatan, serta pendidikan madrasah dan pondok pesantren.",
+
+  maklumatJudul: "Maklumat Pelayanan",
+  maklumatTeks: "\"Dengan ini kami segenap aparatur Kantor Kementerian Agama Kabupaten Murung Raya menyatakan sanggup menyelenggarakan pelayanan publik sesuai standar pelayanan yang telah ditetapkan.\"",
+  maklumatZonaLabel: "Zona Integritas",
+  maklumatZonaStatus: "WBK - WBBM"
+};
+
